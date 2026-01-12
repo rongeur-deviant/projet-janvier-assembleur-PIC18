@@ -1,0 +1,102 @@
+MPLINK 5.09, LINKER
+Linker Map File - Created Mon Jan 12 16:49:35 2026
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                 RES_VECT       code   0x000000    program   0x000066
+                   .cinit    romdata   0x000066    program   0x000002
+                MAIN_PROG       code   0x000068    program   0x0001da
+.config_300000_BUILD/DEFAULT/DEBUG/_EXT/1864822    romdata   0x300000    program   0x000001
+.config_300001_BUILD/DEFAULT/DEBUG/_EXT/1864822    romdata   0x300001    program   0x000001
+.config_300004_BUILD/DEFAULT/DEBUG/_EXT/1864822    romdata   0x300004    program   0x000001
+.config_300007_BUILD/DEFAULT/DEBUG/_EXT/1864822    romdata   0x300007    program   0x000001
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000241      
+                            0x300000    0x300001      
+                            0x300004    0x300004      
+                            0x300007    0x300007      
+            582 out of 33054 program addresses used, program memory utilization is 1%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+          AllRGBLEDsWhite   0x0001de    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                     Bit0   0x000106    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                     Bit1   0x000124    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                     Blue   0x0001a6    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                 ColorOff   0x000168    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                  ColorOn   0x000146    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+            ConfigButtons   0x000034    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                ConfigOsc   0x000004    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                ConfigPWM   0x000066    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+              ConfigPorts   0x000012    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                ConfigRGB   0x000026    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               DELAY_0_2S   0x000080    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                DELAY_run   0x000090    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                    Green   0x000198    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               LEDv_blink   0x0000e2    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                MAIN_LOOP   0x000078    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                RGBLEDoff   0x0001d0    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                      Red   0x00018a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                 ResetRGB   0x000210    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                    START   0x000068    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           TurnOffAllLEDs   0x0000d6    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               TurnOffLD0   0x00009a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               TurnOffLD1   0x0000a6    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               TurnOffLD2   0x0000b2    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               TurnOffLD3   0x0000be    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+            TurnOnAllLEDs   0x0000ca    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                TurnOnLD0   0x0000a0    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                TurnOnLD1   0x0000ac    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                TurnOnLD2   0x0000b8    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                TurnOnLD3   0x0000c4    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                    White   0x0001c2    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                   Yellow   0x0001b4    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                ConfigOsc   0x000004    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+              ConfigPorts   0x000012    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                ConfigRGB   0x000026    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+            ConfigButtons   0x000034    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                ConfigPWM   0x000066    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                    START   0x000068    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                MAIN_LOOP   0x000078    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               DELAY_0_2S   0x000080    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                DELAY_run   0x000090    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               TurnOffLD0   0x00009a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                TurnOnLD0   0x0000a0    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               TurnOffLD1   0x0000a6    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                TurnOnLD1   0x0000ac    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               TurnOffLD2   0x0000b2    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                TurnOnLD2   0x0000b8    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               TurnOffLD3   0x0000be    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                TurnOnLD3   0x0000c4    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+            TurnOnAllLEDs   0x0000ca    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           TurnOffAllLEDs   0x0000d6    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+               LEDv_blink   0x0000e2    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                     Bit0   0x000106    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                     Bit1   0x000124    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                  ColorOn   0x000146    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                 ColorOff   0x000168    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                      Red   0x00018a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                    Green   0x000198    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                     Blue   0x0001a6    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                   Yellow   0x0001b4    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                    White   0x0001c2    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                RGBLEDoff   0x0001d0    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+          AllRGBLEDsWhite   0x0001de    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                 ResetRGB   0x000210    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+
+

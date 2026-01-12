@@ -12,7 +12,9 @@
             <asminc-extensions/>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
-            <sourceRootList/>
+            <sourceRootList>
+                <sourceRootElem>C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X</sourceRootElem>
+            </sourceRootList>
             <confList>
                 <confElem>
                     <name>default</name>
