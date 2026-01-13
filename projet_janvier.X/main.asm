@@ -9,8 +9,8 @@
 ; CONFIGURATION BITS
 ;*******************************************************************************
 
-; CONFIG1L
-CONFIG FEXTOSC = OFF ; pas d?oscillateur externe
+; CONFIG1L :
+CONFIG FEXTOSC = OFF ; pas d'oscillateur externe
 CONFIG RSTOSC  = HFINTOSC_64MHZ
 
 ; CONFIG1H :
@@ -21,6 +21,14 @@ CONFIG WDTE = OFF
 
 ; CONFIG4H :
 CONFIG LVP = OFF
+
+;*******************************************************************************
+; VARIABLE DEFINITIONS
+;*******************************************************************************
+  
+var	UDATA_ACS
+lastBtnPressed	    RES	    1 ; dernier bouton pressé
+ledCounter          RES     1 ; compteur de leds (0 à 4)
 
 ;*******************************************************************************
 ; RESET VECTOR
@@ -143,6 +151,41 @@ ConfigPWM:
     ; MOVLW   b'00111100'        ; CCP2 en mode PWM
     ; MOVWF   CCP2CON
     ; RETURN    
+ 
+;*******************************************************************************
+; TODO - INTERRUPT SERVICE ROUTINES (ISRs)
+;
+; there are a few different ways to structure interrupt routines in the 8
+; bit device families.  on PIC18's the high priority and low priority
+; interrupts are located at 0x0008 and 0x0018, respectively.  (on PIC16's and
+; lower the interrupt is at 0x0004.  between device families there is subtle
+; variation in the both the hardware supporting the ISR (for restoring
+; interrupt context) as well as the software used to restore the context
+; (without corrupting the STATUS bits)).
+;
+; general formats are shown below in relocatible format.
+;
+;----------------------------------PIC18's--------------------------------------
+;
+; ISRHV     CODE    0x0008
+;     Goto    HIGH_ISR
+; ISRLV     CODE    0x0018
+;     Goto    LOW_ISR
+;
+; ISRH      CODE                     ; let linker place high ISR routine
+; HIGH_ISR
+;     <Insert High Priority ISR Here - no SW context saving>
+;     RETFIE  FAST
+;
+; ISRL      CODE                     ; let linker place low ISR routine
+; LOW_ISR
+;       <Search the device datasheet for 'context' and copy interrupt
+;       context saving code here>
+;     RETFIE
+;
+;*******************************************************************************
+
+; TODO INSERT ISR HERE
     
 ;*******************************************************************************
 ; MAIN PROGRAM
@@ -159,13 +202,19 @@ START:
     CALL ConfigButtons
     ; CALL ConfigPWM
     ; CALL ConfigI2C
+    
+    CLRF ledCounter ; compteur = 0 au démarrage
 
 ;*******************************************************************************
 ; BOUCLE PRINCIPALE (main loop)
 ;*******************************************************************************
+    
 MAIN_LOOP:
-        CALL LEDv_blink
-	CALL AllRGBLEDsWhite
+        ; CALL LEDv_blink
+	; CALL FirstRGBLEDWhite
+	; CALL AllRGBLEDsWhite
+	
+	CALL AwaitButton
 	
 	GOTO MAIN_LOOP ; boucle infinie
 	
@@ -212,6 +261,27 @@ TEMPO_0_5S:
 TEMPO_0_5S_RUN:    
     BTFSS   T0CON0, 5, ACCESS	    ; tester l'overflow du timer
     GOTO    TEMPO_0_5S_RUN  
+    BCF	    T0CON0, 7, ACCESS	    ; reset bit de démarrage
+    RETURN
+   
+    
+TEMPO_0_2S:
+    
+    MOVLW   B'10010000'		    
+    MOVWF   T0CON0, ACCESS	    ; timer1 clock Sosc
+    
+    MOVLW   B'10010000'	
+    MOVWF   T0CON1, ACCESS	    ; set les valeurs du registre T0CON1
+    
+    ; initialiser la valeur du timer à 58036
+    MOVLW   0xE2
+    MOVWF   TMR0H		    ; maj TMR0H
+    MOVLW   0xB4		    ; maj TMR0L
+    MOVWF   TMR0L
+    
+TEMPO_0_2S_RUN:    
+    BTFSS   T0CON0, 5, ACCESS	    ; tester l'overflow du timer
+    GOTO    TEMPO_0_2S_RUN
     BCF	    T0CON0, 7, ACCESS	    ; reset bit de démarrage
     RETURN
 
@@ -278,27 +348,6 @@ TEMPO_20MS_RUN:
     BCF	    T0CON0, 7, ACCESS	    ; reset bit de démarrage
     RETURN    
 
-
-TEMPO_0_2S:
-    
-    MOVLW   B'10010000'		    
-    MOVWF   T0CON0, ACCESS	    ; timer1 clock Sosc
-    
-    MOVLW   B'10010000'	
-    MOVWF   T0CON1, ACCESS	    ; set les valeurs du registre T0CON1
-    
-    ; initialiser la valeur du timer à 58036
-    MOVLW   0xE2
-    MOVWF   TMR0H		    ; maj TMR0H
-    MOVLW   0xB4		    ; maj TMR0L
-    MOVWF   TMR0L
-    
-TEMPO_0_2S_RUN:    
-    BTFSS   T0CON0, 5, ACCESS	    ; tester l'overflow du timer
-    GOTO    TEMPO_0_2S_RUN
-    BCF	    T0CON0, 7, ACCESS	    ; reset bit de démarrage
-    RETURN
- 	
 ;*******************************************************************************
 ; ROUTINES LEDs VERTES (RA0 à RA3)
 ;*******************************************************************************
@@ -384,18 +433,20 @@ LEDv_blink: ; fait blinker les 4 leds vertes en série (serpent)
         BCF     LATA, 3
 
         RETURN
-  
+
 ;*******************************************************************************
-; ROUTINES LEDS RGB (G-->R-->B)
+; ROUTINES LEDS RGB (G-->R-->B) (RC1)
 ;*******************************************************************************
 
 ; envoie un bit à 0 avec la bonne temporisation
 Bit0:
     BANKSEL LATC
     BSF     LATC, 1        ; [1]
+    
     NOP                    ; [2]
     NOP                    ; [3]
     NOP                    ; [4]
+    
     BCF     LATC, 1        ; [5] fin HAUT
     
     ; partie BASSE (comblage pour ~1200ns)
@@ -408,12 +459,14 @@ Bit0:
     NOP
     NOP
     NOP
+    
     RETURN
 
 ; envoie un bit à 1 avec la bonne temporisation
 Bit1:
     BANKSEL LATC
     BSF     LATC, 1        ; [1]
+    
     NOP                    ; [2]
     NOP                    ; [3]
     NOP                    ; [4]
@@ -422,6 +475,7 @@ Bit1:
     NOP                    ; [7]
     NOP                    ; [8]
     NOP                    ; [9]
+    
     BCF     LATC, 1        ; [10] fin HAUT
 
     ; partie BASSE
@@ -430,6 +484,7 @@ Bit1:
     NOP
     NOP
     NOP
+    
     RETURN
 
 ; envoie un byte (octet) valant b'00100000' = d'32'
@@ -463,9 +518,9 @@ ColorOff:
 
 ; rouge pour UNE rgb ...
 Red:
-    CALL ColorOff
-    CALL ColorOn
-    CALL ColorOff
+    CALL ColorOff ; G
+    CALL ColorOn ; R
+    CALL ColorOff ; B
     RETURN
 
 Green: ; ... vert ...
@@ -514,6 +569,21 @@ AllRGBLEDsWhite:
     CALL White
     RETURN
 
+FirstRGBLEDWhite:
+    CALL White
+    CALL RGBLEDOff
+    CALL RGBLEDOff
+    CALL RGBLEDOff
+    CALL RGBLEDOff
+    CALL RGBLEDOff
+    CALL RGBLEDOff
+    CALL RGBLEDOff
+    CALL RGBLEDOff
+    CALL RGBLEDOff
+    CALL RGBLEDOff
+    CALL RGBLEDOff
+    RETURN
+    
 ; éteint toutes les rgb (~noir PARTOUT)
 AllRGBLEDsOff:
     CALL RGBLEDOff
@@ -528,6 +598,103 @@ AllRGBLEDsOff:
     CALL RGBLEDOff
     CALL RGBLEDOff
     CALL RGBLEDOff
+    RETURN
+    
+;*******************************************************************************
+; ROUTINES BUTTON (RB1 à RB4)
+;*******************************************************************************       
+    
+AwaitButton:
+    CALL TEMPO_0_2S
+    BANKSEL PORTB
+    BTFSC   PORTB,  4
+	GOTO ButtonPress_3
+	MOVLW 0x04
+	MOVWF lastBtnPressed
+	CALL HandleButton_4
+	RETURN
+	
+    ButtonPress_3:
+        BANKSEL PORTB
+	BTFSC   PORTB, 3
+	    GOTO ButtonPress_2
+	    MOVLW 0x03
+	    MOVWF lastBtnPressed
+	    ; ajouter le call à l'handle BTN3
+	    RETURN
+	    
+    ButtonPress_2:
+        BANKSEL PORTB
+	BTFSC   PORTB, 2
+	    GOTO ButtonPress_1
+	    MOVLW 0x02
+	    MOVWF lastBtnPressed
+	    ; ajouter le call à l'handle BTN2
+	    RETURN
+	    
+    ButtonPress_1:
+        BANKSEL PORTB
+	BTFSC   PORTB, 1
+	    GOTO ButtonPress_NO
+	    MOVLW 0x01
+	    MOVWF lastBtnPressed
+	    ; ajouter le call à l'handle BTN1
+	    RETURN    
+	
+    ButtonPress_NO:
+	RETURN
+    
+HandleButton_4:    
+    ; --- compteur == 0 ? ---
+    MOVF    ledCounter, W
+    BZ      Led0
+
+    ; --- compteur == 1 ? ---
+    MOVLW   1
+    CPFSEQ  ledCounter
+    GOTO    Test2
+    CALL    TurnOnLD1
+    CALL    IncCounter
+    RETURN
+
+Test2:
+    ; --- compteur == 2 ? ---
+    MOVLW   2
+    CPFSEQ  ledCounter
+    GOTO    Test3
+    CALL    TurnOnLD2
+    CALL    IncCounter
+    RETURN
+
+Test3:
+    ; --- compteur == 3 ? ---
+    MOVLW   3
+    CPFSEQ  ledCounter
+    GOTO    Test4
+    CALL    TurnOnLD3
+    CALL    IncCounter
+    RETURN
+
+
+Test4:
+    ; --- compteur == 4 ? ---
+    MOVLW   4
+    CPFSLT  ledCounter
+    GOTO    EndHandle ; sécurité
+    RETURN
+
+Led0:
+    CALL    TurnOnLD0
+    CALL    IncCounter
+    RETURN
+    
+IncCounter:
+    INCF    ledCounter, F
+    RETURN 
+    
+EndHandle:
+    CLRF    ledCounter ; sécurité
+    CALL    TurnOffAllLEDs
     RETURN
     
 END
