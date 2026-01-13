@@ -121,7 +121,7 @@ ConfigButtons:
     BSF     INLVLB, 4          ; active une entrée en TTL sur RB4 (important)
     RETURN	
 
-ConfigPWM:
+; ConfigPWM:
     ; configuration du module CCP2 pour PWM
     ; MOVLW   b'00000100'        ; CCP2 utilise Timer2
     ; MOVWF   CCPTMRS
@@ -604,17 +604,19 @@ AllRGBLEDsOff:
 ; ROUTINES BUTTON (RB1 à RB4)
 ;*******************************************************************************       
     
-AwaitButton:
+AwaitButton: ; test si un bouton est pressé
     CALL TEMPO_0_2S
-    BANKSEL PORTB
-    BTFSC   PORTB,  4
+    
+    ButtonPress_4: ; RB4
+	BANKSEL PORTB
+	BTFSC   PORTB,  4
 	GOTO ButtonPress_3
 	MOVLW 0x04
 	MOVWF lastBtnPressed
 	CALL HandleButton_4
 	RETURN
 	
-    ButtonPress_3:
+    ButtonPress_3: ; RB3
         BANKSEL PORTB
 	BTFSC   PORTB, 3
 	    GOTO ButtonPress_2
@@ -623,7 +625,7 @@ AwaitButton:
 	    ; ajouter le call à l'handle BTN3
 	    RETURN
 	    
-    ButtonPress_2:
+    ButtonPress_2: ; RB2
         BANKSEL PORTB
 	BTFSC   PORTB, 2
 	    GOTO ButtonPress_1
@@ -632,69 +634,149 @@ AwaitButton:
 	    ; ajouter le call à l'handle BTN2
 	    RETURN
 	    
-    ButtonPress_1:
+    ButtonPress_1: ; RB1
         BANKSEL PORTB
 	BTFSC   PORTB, 1
 	    GOTO ButtonPress_NO
 	    MOVLW 0x01
 	    MOVWF lastBtnPressed
-	    ; ajouter le call à l'handle BTN1
+	    CALL HandleButton_1
 	    RETURN    
 	
     ButtonPress_NO:
 	RETURN
-    
-HandleButton_4:    
-    ; --- compteur == 0 ? ---
-    MOVF    ledCounter, W
-    BZ      Led0
 
-    ; --- compteur == 1 ? ---
+; ----- HANDLE BUTTON 4 (RB4 : MINs (+)) -----
+	
+HandleButton_4:    
+    ; --- compteur == 0 ? (branch si non, continue si oui) ---
+    MOVF    ledCounter, W
+    BZ      Btn4Counter0Handle
+
+    ; --- compteur == 1 ? (branch si non, continue si oui) ---
     MOVLW   1
     CPFSEQ  ledCounter
-    GOTO    Test2
+    GOTO    Btn4Test2
+    CALL    TurnOnLD0
     CALL    TurnOnLD1
-    CALL    IncCounter
+    CALL    TurnOffLD2
+    CALL    TurnOffLD3
+    CALL    IncLEDvCounter
     RETURN
 
-Test2:
-    ; --- compteur == 2 ? ---
+Btn4Test2:
+    ; --- test si compteur == 2 ? (branch si non, continue si oui) ---
     MOVLW   2
     CPFSEQ  ledCounter
-    GOTO    Test3
+    GOTO    Btn4Test3
+    CALL    TurnOnLD0
+    CALL    TurnOnLD1
     CALL    TurnOnLD2
-    CALL    IncCounter
+    CALL    TurnOffLD3
+    CALL    IncLEDvCounter
     RETURN
 
-Test3:
-    ; --- compteur == 3 ? ---
+Btn4Test3:
+    ; --- test si compteur == 3 ? (branch si non, continue si oui) ---
     MOVLW   3
     CPFSEQ  ledCounter
-    GOTO    Test4
-    CALL    TurnOnLD3
-    CALL    IncCounter
+    GOTO    Btn4Test4
+    CALL    TurnOnAllLEDs
+    CALL    IncLEDvCounter
     RETURN
 
-
-Test4:
-    ; --- compteur == 4 ? ---
+Btn4Test4:
+    ; --- test si compteur < 4 ? (return si oui, branch sinon) ---
     MOVLW   4
     CPFSLT  ledCounter
-    GOTO    EndHandle ; sécurité
+    GOTO    Btn4EndHandle ; sécurité
     RETURN
 
-Led0:
-    CALL    TurnOnLD0
-    CALL    IncCounter
-    RETURN
-    
-IncCounter:
-    INCF    ledCounter, F
-    RETURN 
-    
-EndHandle:
+; handle (routine) de fin --> clear les leds vertes et la valeur de ledCounter
+Btn4EndHandle:
     CLRF    ledCounter ; sécurité
     CALL    TurnOffAllLEDs
+    RETURN
+    
+; handle (routine) relative au test positif de ledCounter = 0 ...
+Btn4Counter0Handle:
+    CALL    TurnOnLD0
+    CALL    TurnOffLD1
+    CALL    TurnOffLD2
+    CALL    TurnOffLD3
+    CALL    IncLEDvCounter
+    RETURN
+
+; ----- HANDLE BUTTON 1 (RB1 : MINs (-)) -----
+
+HandleButton_1:
+    ; --- compteur == 0 ? (branch si non, continue si oui) ---
+    MOVF    ledCounter, W
+    BZ      Btn1Counter0Handle
+
+    ; --- compteur == 1 ? (branch si non, continue si oui) ---
+    MOVLW   1
+    CPFSEQ  ledCounter
+    GOTO    Btn1Test2
+    CALL    TurnOffAllLEDs
+    CALL    DecLEDvCounter
+    RETURN
+
+Btn1Test2:
+    ; --- test si compteur == 2 ? (branch si non, continue si oui) ---
+    MOVLW   2
+    CPFSEQ  ledCounter
+    GOTO    Btn1Test3
+    CALL    TurnOnLD0
+    CALL    TurnOffLD1
+    CALL    TurnOffLD2
+    CALL    TurnOffLD3
+    CALL    DecLEDvCounter
+    RETURN
+
+Btn1Test3:
+    ; --- test si compteur == 3 ? (branch si non, continue si oui) ---
+    MOVLW   3
+    CPFSEQ  ledCounter
+    GOTO    Btn1Test4
+    CALL    TurnOnLD0
+    CALL    TurnOnLD1
+    CALL    TurnOffLD2
+    CALL    TurnOffLD3
+    CALL    DecLEDvCounter
+    RETURN
+
+Btn1Test4:
+    ; --- test si compteur == 4 ? (return si non, continue si oui) ---
+    MOVLW   4
+    CPFSEQ  ledCounter
+    RETURN
+    CALL    TurnOnLD0
+    CALL    TurnOnLD1
+    CALL    TurnOnLD2
+    CALL    TurnOffLD3
+    CALL    DecLEDvCounter
+    RETURN
+
+; handle (routine) relative au test positif de ledCounter = 0 ...
+Btn1Counter0Handle:
+    CALL    TurnOnAllLEDs
+    CALL    IncLEDvCounter
+    CALL    IncLEDvCounter
+    CALL    IncLEDvCounter
+    CALL    IncLEDvCounter
+    RETURN
+    
+; ----- ROUTINES GENERALES BUTTONS -----
+    
+; incrémenter la valeur de la var ledCounter    
+IncLEDvCounter:
+    INCF    ledCounter, F
+    RETURN 
+
+; décrémenter la valeur de la var ledCounter      
+DecLEDvCounter:
+    DECF    ledCounter, F
     RETURN
     
 END

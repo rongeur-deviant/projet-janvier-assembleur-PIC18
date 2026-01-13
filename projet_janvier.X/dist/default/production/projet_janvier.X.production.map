@@ -1,12 +1,12 @@
 MPLINK 5.09, LINKER
-Linker Map File - Created Tue Jan 13 14:55:21 2026
+Linker Map File - Created Tue Jan 13 16:03:30 2026
 
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
                 ---------  ---------  ---------  ---------  ---------
                  RES_VECT       code   0x000000    program   0x000066
                    .cinit    romdata   0x000066    program   0x000002
-                MAIN_PROG       code   0x000068    program   0x00032e
+                MAIN_PROG       code   0x000068    program   0x0003de
 .config_300000_BUILD/DEFAULT/PRODUCTION/_EXT/18    romdata   0x300000    program   0x000001
 .config_300001_BUILD/DEFAULT/PRODUCTION/_EXT/18    romdata   0x300001    program   0x000001
 .config_300004_BUILD/DEFAULT/PRODUCTION/_EXT/18    romdata   0x300004    program   0x000001
@@ -18,11 +18,11 @@ Linker Map File - Created Tue Jan 13 14:55:21 2026
                               Program Memory Usage 
                                Start         End      
                            ---------   ---------      
-                            0x000000    0x000395      
+                            0x000000    0x000445      
                             0x300000    0x300001      
                             0x300004    0x300004      
                             0x300007    0x300007      
-            922 out of 33054 program addresses used, program memory utilization is 2%
+            1098 out of 33054 program addresses used, program memory utilization is 3%
 
 
 
@@ -35,24 +35,33 @@ Linker Map File - Created Tue Jan 13 14:55:21 2026
                      Bit0   0x00018a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                      Bit1   0x0001aa    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                      Blue   0x00022c    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+       Btn1Counter0Handle   0x000428    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn1Test2   0x0003d0    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn1Test3   0x0003ee    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn1Test4   0x00040c    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+       Btn4Counter0Handle   0x0003a4    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+            Btn4EndHandle   0x00039c    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn4Test2   0x000362    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn4Test3   0x000380    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn4Test4   0x000392    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
             ButtonPress_1   0x00032c    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
             ButtonPress_2   0x00031e    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
             ButtonPress_3   0x000310    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-           ButtonPress_NO   0x00033a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+            ButtonPress_4   0x0002fe    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           ButtonPress_NO   0x00033e    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                  ColorOff   0x0001ee    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                   ColorOn   0x0001cc    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
             ConfigButtons   0x000034    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                 ConfigOsc   0x000004    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                ConfigPWM   0x000066    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
               ConfigPorts   0x000012    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                 ConfigRGB   0x000026    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                EndHandle   0x00038e    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           DecLEDvCounter   0x000442    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
          FirstRGBLEDWhite   0x000296    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                     Green   0x00021e    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-           HandleButton_4   0x00033c    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-               IncCounter   0x00038a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           HandleButton_1   0x0003ba    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           HandleButton_4   0x000340    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           IncLEDvCounter   0x00043e    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                LEDv_blink   0x000166    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                     Led0   0x000380    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                 MAIN_LOOP   0x00007a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                 RGBLEDOff   0x000256    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                       Red   0x000210    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
@@ -69,9 +78,6 @@ Linker Map File - Created Tue Jan 13 14:55:21 2026
              TEMPO_1S_RUN   0x000092    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                TEMPO_20MS   0x000104    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
            TEMPO_20MS_RUN   0x000114    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                    Test2   0x000352    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                    Test3   0x000364    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                    Test4   0x000376    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
            TurnOffAllLEDs   0x00015a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                TurnOffLD0   0x00011e    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                TurnOffLD1   0x00012a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
@@ -96,7 +102,6 @@ Linker Map File - Created Tue Jan 13 14:55:21 2026
               ConfigPorts   0x000012    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                 ConfigRGB   0x000026    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
             ConfigButtons   0x000034    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                ConfigPWM   0x000066    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                     START   0x000068    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                 MAIN_LOOP   0x00007a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                  TEMPO_1S   0x000082    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
@@ -136,17 +141,24 @@ Linker Map File - Created Tue Jan 13 14:55:21 2026
          FirstRGBLEDWhite   0x000296    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
             AllRGBLEDsOff   0x0002c8    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
               AwaitButton   0x0002fa    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+            ButtonPress_4   0x0002fe    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
             ButtonPress_3   0x000310    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
             ButtonPress_2   0x00031e    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
             ButtonPress_1   0x00032c    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-           ButtonPress_NO   0x00033a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-           HandleButton_4   0x00033c    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                    Test2   0x000352    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                    Test3   0x000364    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                    Test4   0x000376    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                     Led0   0x000380    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-               IncCounter   0x00038a    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
-                EndHandle   0x00038e    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           ButtonPress_NO   0x00033e    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           HandleButton_4   0x000340    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn4Test2   0x000362    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn4Test3   0x000380    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn4Test4   0x000392    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+            Btn4EndHandle   0x00039c    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+       Btn4Counter0Handle   0x0003a4    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           HandleButton_1   0x0003ba    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn1Test2   0x0003d0    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn1Test3   0x0003ee    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+                Btn1Test4   0x00040c    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+       Btn1Counter0Handle   0x000428    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           IncLEDvCounter   0x00043e    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
+           DecLEDvCounter   0x000442    program     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
            lastBtnPressed   0x000000       data     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
                ledCounter   0x000001       data     static C:\Users\louis\source\repos\ISEN\CSI3\projet-janvier-assembleur-PIC18\projet_janvier.X\main.asm
 

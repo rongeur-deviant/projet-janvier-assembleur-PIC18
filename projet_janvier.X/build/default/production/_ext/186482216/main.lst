@@ -1,4 +1,4 @@
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE  1
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -57,7 +57,7 @@ Warning[205]: Found directive in column 1. (CONFIG)
                       00036 
                       00037 RES_VECT CODE 0x0000
 000000 EF?? F???      00038         GOTO    START
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE  2
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -116,7 +116,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00089 
 000034                00090 ConfigButtons:
                       00091     ; RB1 (bouton minutes (-))
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE  3
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -154,7 +154,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 000062 8915           00121     BSF     INLVLB, 4          ; active une entrée en TTL sur RB4 (important)
 000064 0012           00122     RETURN      
                       00123 
-000066                00124 ConfigPWM:
+                      00124 ; ConfigPWM:
                       00125     ; configuration du module CCP2 pour PWM
                       00126     ; MOVLW   b'00000100'        ; CCP2 utilise Timer2
                       00127     ; MOVWF   CCPTMRS
@@ -175,7 +175,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00142     ; CLRF    CCPR2L
                       00143 
                       00144     ; configuration de Timer2
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE  4
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -234,7 +234,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00195 
 000000                00196 START:
                       00197     
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE  5
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -293,7 +293,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00248     
 000034 0E90           00249     MOVLW   B'10010000'             
 000036 6ED5           00250     MOVWF   T0CON0, ACCESS          ; timer1 clock Sosc
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE  6
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -352,7 +352,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 000076 6ED3           00301     MOVWF   TMR0L
                       00302     
 000078                00303 TEMPO_100US_RUN:    
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE  7
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -411,7 +411,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00354 
 0000B6                00355 TurnOffLD0: ; éteint la led0
 0000B6 010F           00356         BANKSEL LATA
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE  8
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -470,7 +470,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0000F8 9483           00407         BCF     LATA, 2
 0000FA 9683           00408         BCF     LATA, 3
 0000FC 0012           00409         RETURN
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE  9
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -529,7 +529,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 00013C 0000           00460     NOP
 00013E 0000           00461     NOP
                       00462     
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 10
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -588,7 +588,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 000196 EC?? F???      00513     CALL Bit0
 00019A EC?? F???      00514     CALL Bit0
 00019E EC?? F???      00515     CALL Bit0
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 11
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -647,7 +647,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 00021C EC?? F???      00566     CALL White
 000220 EC?? F???      00567     CALL White
 000224 EC?? F???      00568     CALL White
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 12
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 12
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -691,118 +691,213 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00604 ; ROUTINES BUTTON (RB1 à RB4)
                       00605 ;*******************************************************************************       
                       00606     
-000292                00607 AwaitButton:
+000292                00607 AwaitButton: ; test si un bouton est pressé
 000292 EC?? F???      00608     CALL TEMPO_0_2S
-000296 010F           00609     BANKSEL PORTB
-000298 B88E           00610     BTFSC   PORTB,  4
-00029A EF?? F???      00611         GOTO ButtonPress_3
-00029E 0E04           00612         MOVLW 0x04
-0002A0 6E??           00613         MOVWF lastBtnPressed
-0002A2 EC?? F???      00614         CALL HandleButton_4
-0002A6 0012           00615         RETURN
-                      00616         
+                      00609     
+Warning[207]: Found label after column 1. (ButtonPress_4)
+000296                00610     ButtonPress_4: ; RB4
+000296 010F           00611         BANKSEL PORTB
+000298 B88E           00612         BTFSC   PORTB,  4
+00029A EF?? F???      00613         GOTO ButtonPress_3
+00029E 0E04           00614         MOVLW 0x04
+0002A0 6E??           00615         MOVWF lastBtnPressed
+0002A2 EC?? F???      00616         CALL HandleButton_4
+0002A6 0012           00617         RETURN
+                      00618         
 Warning[207]: Found label after column 1. (ButtonPress_3)
-0002A8                00617     ButtonPress_3:
-0002A8 010F           00618         BANKSEL PORTB
-0002AA B68E           00619         BTFSC   PORTB, 3
-0002AC EF?? F???      00620             GOTO ButtonPress_2
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 13
+0002A8                00619     ButtonPress_3: ; RB3
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 13
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0002B0 0E03           00621             MOVLW 0x03
-0002B2 6E??           00622             MOVWF lastBtnPressed
-                      00623             ; ajouter le call à l'handle BTN3
-0002B4 0012           00624             RETURN
-                      00625             
+0002A8 010F           00620         BANKSEL PORTB
+0002AA B68E           00621         BTFSC   PORTB, 3
+0002AC EF?? F???      00622             GOTO ButtonPress_2
+0002B0 0E03           00623             MOVLW 0x03
+0002B2 6E??           00624             MOVWF lastBtnPressed
+                      00625             ; ajouter le call à l'handle BTN3
+0002B4 0012           00626             RETURN
+                      00627             
 Warning[207]: Found label after column 1. (ButtonPress_2)
-0002B6                00626     ButtonPress_2:
-0002B6 010F           00627         BANKSEL PORTB
-0002B8 B48E           00628         BTFSC   PORTB, 2
-0002BA EF?? F???      00629             GOTO ButtonPress_1
-0002BE 0E02           00630             MOVLW 0x02
-0002C0 6E??           00631             MOVWF lastBtnPressed
-                      00632             ; ajouter le call à l'handle BTN2
-0002C2 0012           00633             RETURN
-                      00634             
+0002B6                00628     ButtonPress_2: ; RB2
+0002B6 010F           00629         BANKSEL PORTB
+0002B8 B48E           00630         BTFSC   PORTB, 2
+0002BA EF?? F???      00631             GOTO ButtonPress_1
+0002BE 0E02           00632             MOVLW 0x02
+0002C0 6E??           00633             MOVWF lastBtnPressed
+                      00634             ; ajouter le call à l'handle BTN2
+0002C2 0012           00635             RETURN
+                      00636             
 Warning[207]: Found label after column 1. (ButtonPress_1)
-0002C4                00635     ButtonPress_1:
-0002C4 010F           00636         BANKSEL PORTB
-0002C6 B28E           00637         BTFSC   PORTB, 1
-0002C8 EF?? F???      00638             GOTO ButtonPress_NO
-0002CC 0E01           00639             MOVLW 0x01
-0002CE 6E??           00640             MOVWF lastBtnPressed
-                      00641             ; ajouter le call à l'handle BTN1
-0002D0 0012           00642             RETURN    
-                      00643         
+0002C4                00637     ButtonPress_1: ; RB1
+0002C4 010F           00638         BANKSEL PORTB
+0002C6 B28E           00639         BTFSC   PORTB, 1
+0002C8 EF?? F???      00640             GOTO ButtonPress_NO
+0002CC 0E01           00641             MOVLW 0x01
+0002CE 6E??           00642             MOVWF lastBtnPressed
+0002D0 EC?? F???      00643             CALL HandleButton_1
+0002D4 0012           00644             RETURN    
+                      00645         
 Warning[207]: Found label after column 1. (ButtonPress_NO)
-0002D2                00644     ButtonPress_NO:
-0002D2 0012           00645         RETURN
-                      00646     
-0002D4                00647 HandleButton_4:    
-                      00648     ; --- compteur == 0 ? ---
-0002D4 50??           00649     MOVF    ledCounter, W
-0002D6 E0??           00650     BZ      Led0
-                      00651 
-                      00652     ; --- compteur == 1 ? ---
-0002D8 0E01           00653     MOVLW   1
-0002DA 62??           00654     CPFSEQ  ledCounter
-0002DC EF?? F???      00655     GOTO    Test2
-0002E0 EC?? F???      00656     CALL    TurnOnLD1
-0002E4 EC?? F???      00657     CALL    IncCounter
-0002E8 0012           00658     RETURN
-                      00659 
-0002EA                00660 Test2:
-                      00661     ; --- compteur == 2 ? ---
-0002EA 0E02           00662     MOVLW   2
-0002EC 62??           00663     CPFSEQ  ledCounter
-0002EE EF?? F???      00664     GOTO    Test3
-0002F2 EC?? F???      00665     CALL    TurnOnLD2
-0002F6 EC?? F???      00666     CALL    IncCounter
-0002FA 0012           00667     RETURN
-                      00668 
-0002FC                00669 Test3:
-                      00670     ; --- compteur == 3 ? ---
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 14
+0002D6                00646     ButtonPress_NO:
+0002D6 0012           00647         RETURN
+                      00648 
+                      00649 ; ----- HANDLE BUTTON 4 (RB4 : MINs (+)) -----
+                      00650         
+0002D8                00651 HandleButton_4:    
+                      00652     ; --- compteur == 0 ? (branch si non, continue si oui) ---
+0002D8 50??           00653     MOVF    ledCounter, W
+0002DA E0??           00654     BZ      Btn4Counter0Handle
+                      00655 
+                      00656     ; --- compteur == 1 ? (branch si non, continue si oui) ---
+0002DC 0E01           00657     MOVLW   1
+0002DE 62??           00658     CPFSEQ  ledCounter
+0002E0 EF?? F???      00659     GOTO    Btn4Test2
+0002E4 EC?? F???      00660     CALL    TurnOnLD0
+0002E8 EC?? F???      00661     CALL    TurnOnLD1
+0002EC EC?? F???      00662     CALL    TurnOffLD2
+0002F0 EC?? F???      00663     CALL    TurnOffLD3
+0002F4 EC?? F???      00664     CALL    IncLEDvCounter
+0002F8 0012           00665     RETURN
+                      00666 
+0002FA                00667 Btn4Test2:
+                      00668     ; --- test si compteur == 2 ? (branch si non, continue si oui) ---
+0002FA 0E02           00669     MOVLW   2
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 14
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0002FC 0E03           00671     MOVLW   3
-0002FE 62??           00672     CPFSEQ  ledCounter
-000300 EF?? F???      00673     GOTO    Test4
-000304 EC?? F???      00674     CALL    TurnOnLD3
-000308 EC?? F???      00675     CALL    IncCounter
-00030C 0012           00676     RETURN
-                      00677 
+0002FC 62??           00670     CPFSEQ  ledCounter
+0002FE EF?? F???      00671     GOTO    Btn4Test3
+000302 EC?? F???      00672     CALL    TurnOnLD0
+000306 EC?? F???      00673     CALL    TurnOnLD1
+00030A EC?? F???      00674     CALL    TurnOnLD2
+00030E EC?? F???      00675     CALL    TurnOffLD3
+000312 EC?? F???      00676     CALL    IncLEDvCounter
+000316 0012           00677     RETURN
                       00678 
-00030E                00679 Test4:
-                      00680     ; --- compteur == 4 ? ---
-00030E 0E04           00681     MOVLW   4
-000310 60??           00682     CPFSLT  ledCounter
-000312 EF?? F???      00683     GOTO    EndHandle ; sécurité
-000316 0012           00684     RETURN
-                      00685 
-000318                00686 Led0:
-000318 EC?? F???      00687     CALL    TurnOnLD0
-00031C EC?? F???      00688     CALL    IncCounter
-000320 0012           00689     RETURN
-                      00690     
-000322                00691 IncCounter:
-000322 2A??           00692     INCF    ledCounter, F
-000324 0012           00693     RETURN 
-                      00694     
-000326                00695 EndHandle:
-000326 6A??           00696     CLRF    ledCounter ; sécurité
-000328 EC?? F???      00697     CALL    TurnOffAllLEDs
-00032C 0012           00698     RETURN
-                      00699     
+000318                00679 Btn4Test3:
+                      00680     ; --- test si compteur == 3 ? (branch si non, continue si oui) ---
+000318 0E03           00681     MOVLW   3
+00031A 62??           00682     CPFSEQ  ledCounter
+00031C EF?? F???      00683     GOTO    Btn4Test4
+000320 EC?? F???      00684     CALL    TurnOnAllLEDs
+000324 EC?? F???      00685     CALL    IncLEDvCounter
+000328 0012           00686     RETURN
+                      00687 
+00032A                00688 Btn4Test4:
+                      00689     ; --- test si compteur < 4 ? (return si oui, branch sinon) ---
+00032A 0E04           00690     MOVLW   4
+00032C 60??           00691     CPFSLT  ledCounter
+00032E EF?? F???      00692     GOTO    Btn4EndHandle ; sécurité
+000332 0012           00693     RETURN
+                      00694 
+                      00695 ; handle (routine) de fin --> clear les leds vertes et la valeur de ledCounter
+000334                00696 Btn4EndHandle:
+000334 6A??           00697     CLRF    ledCounter ; sécurité
+000336 EC?? F???      00698     CALL    TurnOffAllLEDs
+00033A 0012           00699     RETURN
+                      00700     
+                      00701 ; handle (routine) relative au test positif de ledCounter = 0 ...
+00033C                00702 Btn4Counter0Handle:
+00033C EC?? F???      00703     CALL    TurnOnLD0
+000340 EC?? F???      00704     CALL    TurnOffLD1
+000344 EC?? F???      00705     CALL    TurnOffLD2
+000348 EC?? F???      00706     CALL    TurnOffLD3
+00034C EC?? F???      00707     CALL    IncLEDvCounter
+000350 0012           00708     RETURN
+                      00709 
+                      00710 ; ----- HANDLE BUTTON 1 (RB1 : MINs (-)) -----
+                      00711 
+000352                00712 HandleButton_1:
+                      00713     ; --- compteur == 0 ? (branch si non, continue si oui) ---
+000352 50??           00714     MOVF    ledCounter, W
+000354 E0??           00715     BZ      Btn1Counter0Handle
+                      00716 
+                      00717     ; --- compteur == 1 ? (branch si non, continue si oui) ---
+000356 0E01           00718     MOVLW   1
+000358 62??           00719     CPFSEQ  ledCounter
+00035A EF?? F???      00720     GOTO    Btn1Test2
+00035E EC?? F???      00721     CALL    TurnOffAllLEDs
+000362 EC?? F???      00722     CALL    DecLEDvCounter
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 15
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+000366 0012           00723     RETURN
+                      00724 
+000368                00725 Btn1Test2:
+                      00726     ; --- test si compteur == 2 ? (branch si non, continue si oui) ---
+000368 0E02           00727     MOVLW   2
+00036A 62??           00728     CPFSEQ  ledCounter
+00036C EF?? F???      00729     GOTO    Btn1Test3
+000370 EC?? F???      00730     CALL    TurnOnLD0
+000374 EC?? F???      00731     CALL    TurnOffLD1
+000378 EC?? F???      00732     CALL    TurnOffLD2
+00037C EC?? F???      00733     CALL    TurnOffLD3
+000380 EC?? F???      00734     CALL    DecLEDvCounter
+000384 0012           00735     RETURN
+                      00736 
+000386                00737 Btn1Test3:
+                      00738     ; --- test si compteur == 3 ? (branch si non, continue si oui) ---
+000386 0E03           00739     MOVLW   3
+000388 62??           00740     CPFSEQ  ledCounter
+00038A EF?? F???      00741     GOTO    Btn1Test4
+00038E EC?? F???      00742     CALL    TurnOnLD0
+000392 EC?? F???      00743     CALL    TurnOnLD1
+000396 EC?? F???      00744     CALL    TurnOffLD2
+00039A EC?? F???      00745     CALL    TurnOffLD3
+00039E EC?? F???      00746     CALL    DecLEDvCounter
+0003A2 0012           00747     RETURN
+                      00748 
+0003A4                00749 Btn1Test4:
+                      00750     ; --- test si compteur == 4 ? (return si non, continue si oui) ---
+0003A4 0E04           00751     MOVLW   4
+0003A6 62??           00752     CPFSEQ  ledCounter
+0003A8 0012           00753     RETURN
+0003AA EC?? F???      00754     CALL    TurnOnLD0
+0003AE EC?? F???      00755     CALL    TurnOnLD1
+0003B2 EC?? F???      00756     CALL    TurnOnLD2
+0003B6 EC?? F???      00757     CALL    TurnOffLD3
+0003BA EC?? F???      00758     CALL    DecLEDvCounter
+0003BE 0012           00759     RETURN
+                      00760 
+                      00761 ; handle (routine) relative au test positif de ledCounter = 0 ...
+0003C0                00762 Btn1Counter0Handle:
+0003C0 EC?? F???      00763     CALL    TurnOnAllLEDs
+0003C4 EC?? F???      00764     CALL    IncLEDvCounter
+0003C8 EC?? F???      00765     CALL    IncLEDvCounter
+0003CC EC?? F???      00766     CALL    IncLEDvCounter
+0003D0 EC?? F???      00767     CALL    IncLEDvCounter
+0003D4 0012           00768     RETURN
+                      00769     
+                      00770 ; ----- ROUTINES GENERALES BUTTONS -----
+                      00771     
+                      00772 ; incrémenter la valeur de la var ledCounter    
+0003D6                00773 IncLEDvCounter:
+0003D6 2A??           00774     INCF    ledCounter, F
+0003D8 0012           00775     RETURN 
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 16
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00776 
+                      00777 ; décrémenter la valeur de la var ledCounter      
+0003DA                00778 DecLEDvCounter:
+0003DA 06??           00779     DECF    ledCounter, F
+0003DC 0012           00780     RETURN
+                      00781     
 Warning[205]: Found directive in column 1. (END)
-                      00700 END
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 15
+                      00782 END
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 17
 
 
 SYMBOL TABLE
@@ -861,7 +956,7 @@ ADACQ3                            00000003
 ADACQ4                            00000004
 ADACQ5                            00000005
 ADACQ6                            00000006
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 16
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 18
 
 
 SYMBOL TABLE
@@ -920,7 +1015,7 @@ ADDEN                             00000003
 ADDSEN                            00000000
 ADERR                             00000F6E
 ADERR0                            00000000
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 17
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 19
 
 
 SYMBOL TABLE
@@ -979,7 +1074,7 @@ ADLTH10                           00000002
 ADLTH11                           00000003
 ADLTH12                           00000004
 ADLTH13                           00000005
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 18
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 20
 
 
 SYMBOL TABLE
@@ -1038,7 +1133,7 @@ ADPREV11                          00000003
 ADPREV12                          00000004
 ADPREV13                          00000005
 ADPREV14                          00000006
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 19
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 21
 
 
 SYMBOL TABLE
@@ -1097,7 +1192,7 @@ ADSOI                             00000003
 ADSTAT                            00000F65
 ADSTAT0                           00000000
 ADSTAT1                           00000001
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 20
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 22
 
 
 SYMBOL TABLE
@@ -1156,7 +1251,7 @@ ANSELA1                           00000001
 ANSELA2                           00000002
 ANSELA3                           00000003
 ANSELA4                           00000004
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 21
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 23
 
 
 SYMBOL TABLE
@@ -1215,7 +1310,7 @@ BRGH                              00000002
 BSR                               00000FE0
 BUSY                              00000005
 Bit0                              00000122
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 22
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 24
 
 
 SYMBOL TABLE
@@ -1223,10 +1318,20 @@ SYMBOL TABLE
 
 Bit1                              00000142
 Blue                              000001C4
+Btn1Counter0Handle                000003C0
+Btn1Test2                         00000368
+Btn1Test3                         00000386
+Btn1Test4                         000003A4
+Btn4Counter0Handle                0000033C
+Btn4EndHandle                     00000334
+Btn4Test2                         000002FA
+Btn4Test3                         00000318
+Btn4Test4                         0000032A
 ButtonPress_1                     000002C4
 ButtonPress_2                     000002B6
 ButtonPress_3                     000002A8
-ButtonPress_NO                    000002D2
+ButtonPress_4                     00000296
+ButtonPress_NO                    000002D6
 C                                 00000000
 C1EN                              00000007
 C1HYS                             00000001
@@ -1264,6 +1369,12 @@ C2POL                             00000004
 C2SYNC                            00000000
 C2TSEL0                           00000002
 C2TSEL1                           00000003
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 25
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 CCP1CAP                           00000FAD
 CCP1CON                           00000FAC
 CCP1CTS0                          00000000
@@ -1274,12 +1385,6 @@ CCP1IE                            00000000
 CCP1IF                            00000000
 CCP1IP                            00000000
 CCP1MD                            00000000
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 23
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 CCP1MODE0                         00000000
 CCP1MODE1                         00000001
 CCP1MODE2                         00000002
@@ -1323,6 +1428,12 @@ CDAFVR0                           00000002
 CDAFVR1                           00000003
 CDIV0                             00000000
 CDIV1                             00000001
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 26
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 CDIV2                             00000002
 CDIV3                             00000003
 CHPOL                             00000005
@@ -1333,12 +1444,6 @@ CHSYNC                            00000004
 CK1PPS                            00000EB6
 CKE                               00000006
 CKP                               00000004
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 24
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 CKPOL                             00000006
 CKPPS                             00000EB6
 CKPS0                             00000004
@@ -1382,6 +1487,12 @@ COSC2                             00000006
 CPUDOZE                           00000ED7
 CRCACC                            00000F76
 CRCACCH                           00000F77
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 27
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 CRCACCL                           00000F76
 CRCCON0                           00000F7C
 CRCCON1                           00000F7D
@@ -1392,12 +1503,6 @@ CRCEN                             00000007
 CRCGO                             00000006
 CRCIE                             00000006
 CRCIF                             00000006
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 25
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 CRCIP                             00000006
 CRCMD                             00000004
 CRCSHFT                           00000F78
@@ -1441,6 +1546,12 @@ CWG1DBR3                          00000003
 CWG1DBR4                          00000004
 CWG1DBR5                          00000005
 CWG1EN                            00000007
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 28
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 CWG1IE                            00000000
 CWG1IF                            00000000
 CWG1IN                            00000005
@@ -1451,12 +1562,6 @@ CWG1INPPS3                        00000003
 CWG1INPPS4                        00000004
 CWG1IP                            00000000
 CWG1ISM                           00000F41
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 26
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 CWG1ISM0                          00000000
 CWG1ISM1                          00000001
 CWG1ISM2                          00000002
@@ -1500,7 +1605,12 @@ ColorOff                          00000186
 ColorOn                           00000164
 ConfigButtons                     00000034
 ConfigOsc                         00000004
-ConfigPWM                         00000066
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 29
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 ConfigPorts                       00000012
 ConfigRGB                         00000026
 DABORT                            00000004
@@ -1510,12 +1620,6 @@ DAC1EN                            00000007
 DAC1NSS                           00000000
 DAC1OE1                           00000005
 DAC1OE2                           00000004
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 27
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 DAC1PSS0                          00000002
 DAC1PSS1                          00000003
 DAC1R0                            00000000
@@ -1560,6 +1664,12 @@ DC0_PWM4DCL                       00000006
 DC1_CLKRCON                       00000004
 DC1_PWM3DCL                       00000007
 DC1_PWM4DCL                       00000007
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 30
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 DC2                               00000000
 DC3                               00000001
 DC4                               00000002
@@ -1569,12 +1679,6 @@ DC7                               00000005
 DC8                               00000006
 DC9                               00000007
 DDRA                              TRISA
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 28
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 DDRB                              TRISB
 DDRC                              TRISC
 DDRD                              TRISD
@@ -1596,10 +1700,10 @@ DOZEN                             00000006
 DSMMD                             00000000
 D_A                               00000005
 D_NOT_A                           00000005
+DecLEDvCounter                    000003DA
 EN                                00000007
 EXTOEN                            00000007
 EXTOR                             00000007
-EndHandle                         00000326
 FAST                              00000001
 FERR                              00000002
 FMT                               00000004
@@ -1619,6 +1723,12 @@ FSR2H                             00000FDA
 FSR2L                             00000FD9
 FULL                              00000000
 FVRCON                            00000F31
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 31
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 FVREN                             00000007
 FVRMD                             00000006
 FVRRDY                            00000006
@@ -1628,12 +1738,6 @@ GCEN                              00000007
 GE                                00000007
 GGO_NOT_DONE                      00000003
 GIE                               00000007
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 29
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 GIEH                              00000007
 GIEL                              00000006
 GIE_GIEH                          00000007
@@ -1678,6 +1782,12 @@ HLVDCON1                          00000F30
 HLVDEN                            00000007
 HLVDIE                            00000007
 HLVDIF                            00000007
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 32
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 HLVDINTH                          00000001
 HLVDINTL                          00000000
 HLVDIP                            00000007
@@ -1687,15 +1797,10 @@ HLVDRDY                           00000004
 HLVDSEL0                          00000000
 HLVDSEL1                          00000001
 HLVDSEL2                          00000002
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 30
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 HLVDSEL3                          00000003
 HYS                               00000001
-HandleButton_4                    000002D4
+HandleButton_1                    00000352
+HandleButton_4                    000002D8
 I2C_DAT                           00000005
 I2C_READ                          00000002
 I2C_START                         00000003
@@ -1736,6 +1841,12 @@ INLVLE                            00000F2A
 INLVLE3                           00000003
 INT0EDG                           00000000
 INT0IE                            00000000
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 33
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 INT0IF                            00000000
 INT0IP                            00000000
 INT0PPS                           00000EA1
@@ -1746,12 +1857,6 @@ INT0PPS3                          00000003
 INT1EDG                           00000001
 INT1IE                            00000001
 INT1IF                            00000001
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 31
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 INT1IP                            00000001
 INT1PPS                           00000EA2
 INT1PPS0                          00000000
@@ -1795,6 +1900,12 @@ IOCAN7                            00000007
 IOCAP                             00000F0C
 IOCAP0                            00000000
 IOCAP1                            00000001
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 34
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 IOCAP2                            00000002
 IOCAP3                            00000003
 IOCAP4                            00000004
@@ -1805,12 +1916,6 @@ IOCBF                             00000F12
 IOCBF0                            00000000
 IOCBF1                            00000001
 IOCBF2                            00000002
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 32
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 IOCBF3                            00000003
 IOCBF4                            00000004
 IOCBF5                            00000005
@@ -1854,6 +1959,12 @@ IOCCN6                            00000006
 IOCCN7                            00000007
 IOCCP                             00000F1C
 IOCCP0                            00000000
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 35
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 IOCCP1                            00000001
 IOCCP2                            00000002
 IOCCP3                            00000003
@@ -1864,12 +1975,6 @@ IOCCP7                            00000007
 IOCEF                             00000F27
 IOCEF3                            00000003
 IOCEN                             00000F28
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 33
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 IOCEN3                            00000003
 IOCEP                             00000F29
 IOCEP3                            00000003
@@ -1886,7 +1991,7 @@ IPR4                              00000EBE
 IPR5                              00000EBF
 IPR6                              00000EC0
 IPR7                              00000EC1
-IncCounter                        00000322
+IncLEDvCounter                    000003D6
 LADR0                             00000000
 LADR1                             00000001
 LADR10                            00000002
@@ -1913,6 +2018,12 @@ LATA                              00000F83
 LATA0                             00000000
 LATA1                             00000001
 LATA2                             00000002
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 36
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 LATA3                             00000003
 LATA4                             00000004
 LATA5                             00000005
@@ -1923,12 +2034,6 @@ LATB0                             00000000
 LATB1                             00000001
 LATB2                             00000002
 LATB3                             00000003
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 34
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 LATB4                             00000004
 LATB5                             00000005
 LATB6                             00000006
@@ -1950,7 +2055,6 @@ LSAC0                             00000002
 LSAC1                             00000003
 LSBD0                             00000004
 LSBD1                             00000005
-Led0                              00000318
 MAIN_LOOP                         00000012
 MC1OUT                            00000000
 MC2OUT                            00000001
@@ -1973,6 +2077,12 @@ MDCHPOL                           00000005
 MDCHS0                            00000000
 MDCHS1                            00000001
 MDCHS2                            00000002
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 37
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 MDCHSYNC                          00000004
 MDCLPOL                           00000001
 MDCLS0                            00000000
@@ -1982,12 +2092,6 @@ MDCLSYNC                          00000000
 MDCON0                            00000F51
 MDCON1                            00000F52
 MDEN                              00000007
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 35
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 MDOPOL                            00000004
 MDOUT                             00000005
 MDSRC                             00000F53
@@ -2032,6 +2136,12 @@ NOSCR                             00000003
 NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BOR                           00000000
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 38
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 NOT_PD                            00000005
 NOT_POR                           00000001
 NOT_RI                            00000002
@@ -2041,12 +2151,6 @@ NOT_SYNC                          00000002
 NOT_T1SYNC                        00000002
 NOT_T3SYNC                        00000002
 NOT_T5SYNC                        00000002
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 36
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 NOT_TO                            00000006
 NOT_W                             00000002
 NOT_WDTWV                         00000005
@@ -2091,6 +2195,12 @@ ODCB0                             00000000
 ODCB1                             00000001
 ODCB2                             00000002
 ODCB3                             00000003
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 39
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 ODCB4                             00000004
 ODCB5                             00000005
 ODCB6                             00000006
@@ -2100,12 +2210,6 @@ ODCC1                             00000001
 ODCC2                             00000002
 ODCC3                             00000003
 ODCC4                             00000004
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 37
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 ODCC5                             00000005
 ODCC6                             00000006
 ODCC7                             00000007
@@ -2150,6 +2254,12 @@ OUT_ZCDCON                        00000005
 OV                                00000003
 OVRA                              00000004
 OVRB                              00000005
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 40
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 OVRC                              00000006
 OVRD                              00000007
 P                                 00000004
@@ -2159,12 +2269,6 @@ P4TSEL0                           00000006
 P4TSEL1                           00000007
 PC                                00000FF9
 PCH0                              00000000
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 38
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 PCH1                              00000001
 PCH2                              00000002
 PCIE                              00000006
@@ -2209,6 +2313,12 @@ PMD5                              00000EE6
 POL                               00000004
 POLA                              00000000
 POLB                              00000001
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 41
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 POLC                              00000002
 POLD                              00000003
 POR                               00000001
@@ -2218,12 +2328,6 @@ PORTB                             00000F8E
 PORTC                             00000F8F
 PORTE                             00000F91
 POSTDEC0                          00000FED
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 39
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 POSTDEC1                          00000FE5
 POSTDEC2                          00000FDD
 POSTINC0                          00000FEE
@@ -2268,6 +2372,12 @@ PSYNC                             00000007
 PWM3CON                           00000FA5
 PWM3DC                            00000FA3
 PWM3DC0                           00000006
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 42
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 PWM3DC1                           00000007
 PWM3DC2                           00000000
 PWM3DC3                           00000001
@@ -2277,12 +2387,6 @@ PWM3DC6                           00000004
 PWM3DC7                           00000005
 PWM3DC8                           00000006
 PWM3DC9                           00000007
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 40
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 PWM3DCH                           00000FA4
 PWM3DCL                           00000FA3
 PWM3EN                            00000007
@@ -2327,6 +2431,12 @@ RA0PPS4                           00000004
 RA1                               00000001
 RA1PPS                            00000EE8
 RA1PPS0                           00000000
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 43
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 RA1PPS1                           00000001
 RA1PPS2                           00000002
 RA1PPS3                           00000003
@@ -2336,12 +2446,6 @@ RA2PPS                            00000EE9
 RA2PPS0                           00000000
 RA2PPS1                           00000001
 RA2PPS2                           00000002
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 41
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 RA2PPS3                           00000003
 RA2PPS4                           00000004
 RA3                               00000003
@@ -2386,6 +2490,12 @@ RB0PPS1                           00000001
 RB0PPS2                           00000002
 RB0PPS3                           00000003
 RB0PPS4                           00000004
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 44
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 RB1                               00000001
 RB1PPS                            00000EF0
 RB1PPS0                           00000000
@@ -2395,12 +2505,6 @@ RB1PPS3                           00000003
 RB1PPS4                           00000004
 RB2                               00000002
 RB2PPS                            00000EF1
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 42
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 RB2PPS0                           00000000
 RB2PPS1                           00000001
 RB2PPS2                           00000002
@@ -2445,6 +2549,12 @@ RC0                               00000000
 RC0PPS                            00000EF7
 RC0PPS0                           00000000
 RC0PPS1                           00000001
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 45
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 RC0PPS2                           00000002
 RC0PPS3                           00000003
 RC0PPS4                           00000004
@@ -2454,12 +2564,6 @@ RC1IF                             00000005
 RC1PPS                            00000EF8
 RC1PPS0                           00000000
 RC1PPS1                           00000001
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 43
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 RC1PPS2                           00000002
 RC1PPS3                           00000003
 RC1PPS4                           00000004
@@ -2504,6 +2608,12 @@ RC7                               00000007
 RC7PPS                            00000EFE
 RC7PPS0                           00000000
 RC7PPS1                           00000001
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 46
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 RC7PPS2                           00000002
 RC7PPS3                           00000003
 RC7PPS4                           00000004
@@ -2513,12 +2623,6 @@ RCIE                              00000005
 RCIF                              00000005
 RCIP                              00000005
 RCREG                             00000F99
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 44
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 RCREG1                            00000F99
 RCSTA                             00000F9D
 RCSTA1                            00000F9D
@@ -2563,6 +2667,12 @@ SCANHADR0                         00000000
 SCANHADR1                         00000001
 SCANHADR10                        00000002
 SCANHADR11                        00000003
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 47
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 SCANHADR12                        00000004
 SCANHADR13                        00000005
 SCANHADR14                        00000006
@@ -2572,12 +2682,6 @@ SCANHADR17                        00000001
 SCANHADR18                        00000002
 SCANHADR19                        00000003
 SCANHADR2                         00000002
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 45
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 SCANHADR20                        00000004
 SCANHADR21                        00000005
 SCANHADR3                         00000003
@@ -2622,6 +2726,12 @@ SCANLADRH                         00000F4A
 SCANLADRL                         00000F49
 SCANLADRU                         00000F4B
 SCANMD                            00000003
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 48
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 SCANMODE0                         00000000
 SCANMODE1                         00000001
 SCANTRIG                          00000F50
@@ -2631,12 +2741,6 @@ SCANTSEL2                         00000002
 SCANTSEL3                         00000003
 SCIE                              00000005
 SCKP                              00000004
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 46
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 SDAHT                             00000003
 SEL0                              00000000
 SEL1                              00000001
@@ -2681,6 +2785,12 @@ SLRB5                             00000005
 SLRB6                             00000006
 SLRB7                             00000007
 SLRC0                             00000000
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 49
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 SLRC1                             00000001
 SLRC2                             00000002
 SLRC3                             00000003
@@ -2690,12 +2800,6 @@ SLRC6                             00000006
 SLRC7                             00000007
 SLRCONA                           00000F0E
 SLRCONB                           00000F16
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 47
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 SLRCONC                           00000F1E
 SMP                               00000007
 SOR                               00000003
@@ -2740,6 +2844,12 @@ SSP1DATPPS3                       00000003
 SSP1DATPPS4                       00000004
 SSP1IE                            00000000
 SSP1IF                            00000000
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 50
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 SSP1IP                            00000000
 SSP1MSK                           00000F94
 SSP1SSPPS                         00000EB9
@@ -2749,12 +2859,6 @@ SSP1SSPPS2                        00000002
 SSP1SSPPS3                        00000003
 SSP1SSPPS4                        00000004
 SSP1STAT                          00000F95
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 48
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 SSPCLKPPS                         00000EB7
 SSPCLKPPS0                        00000000
 SSPCLKPPS1                        00000001
@@ -2799,6 +2903,12 @@ STRB                              00000001
 STRC                              00000002
 STRD                              00000003
 SWDTEN                            00000000
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 51
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 SYNC_CM1CON0                      00000000
 SYNC_CM2CON0                      00000000
 SYNC_TX1STA                       00000004
@@ -2808,12 +2918,6 @@ SYSCMD                            00000007
 T016BIT                           00000004
 T0ASYNC                           00000004
 T0CKIPPS                          00000EA4
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 49
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 T0CKIPPS0                         00000000
 T0CKIPPS1                         00000001
 T0CKIPPS2                         00000002
@@ -2858,6 +2962,12 @@ T1CON                             00000FCF
 T1CS0                             00000000
 T1CS1                             00000001
 T1CS2                             00000002
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 52
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 T1CS3                             00000003
 T1GATE                            00000FD1
 T1GCON                            00000FD0
@@ -2867,12 +2977,6 @@ T1GGO_NOT_DONE                    00000003
 T1GPOL                            00000006
 T1GPPS                            00000EA6
 T1GPPS0                           00000000
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 50
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 T1GPPS1                           00000001
 T1GPPS2                           00000002
 T1GPPS3                           00000003
@@ -2917,6 +3021,12 @@ T2OUTPS3                          00000003
 T2PR                              00000FBC
 T2PSYNC                           00000007
 T2RSEL0                           00000000
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 53
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 T2RSEL1                           00000001
 T2RSEL2                           00000002
 T2RSEL3                           00000003
@@ -2926,12 +3036,6 @@ T3CKIPPS                          00000EA7
 T3CKIPPS0                         00000000
 T3CKIPPS1                         00000001
 T3CKIPPS2                         00000002
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 51
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 T3CKIPPS3                         00000003
 T3CKIPPS4                         00000004
 T3CKPS0                           00000004
@@ -2976,6 +3080,12 @@ T4CS2                             00000002
 T4CS3                             00000003
 T4HLT                             00000FB8
 T4INPPS                           00000EAC
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 54
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 T4INPPS0                          00000000
 T4INPPS1                          00000001
 T4INPPS2                          00000002
@@ -2985,12 +3095,6 @@ T4MODE0                           00000000
 T4MODE1                           00000001
 T4MODE2                           00000002
 T4MODE3                           00000003
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 52
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 T4MODE4                           00000004
 T4ON                              00000007
 T4OUTPS0                          00000000
@@ -3035,6 +3139,12 @@ T5GSPM                            00000004
 T5GSS0                            00000000
 T5GSS1                            00000001
 T5GSS2                            00000002
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 55
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 T5GSS3                            00000003
 T5GTM                             00000005
 T5GVAL                            00000002
@@ -3044,12 +3154,6 @@ T6CKPS0                           00000004
 T6CKPS1                           00000005
 T6CKPS2                           00000006
 T6CKSYNC                          00000005
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 53
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 T6CLK                             00000FB3
 T6CLKCON                          00000FB3
 T6CON                             00000FB1
@@ -3094,6 +3198,12 @@ TEMPO_0_5S_RUN                    00000044
 TEMPO_100US                       00000068
 TEMPO_100US_RUN                   00000078
 TEMPO_10MS                        00000082
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 56
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 TEMPO_10MS_RUN                    00000092
 TEMPO_1S                          0000001A
 TEMPO_1S_RUN                      0000002A
@@ -3103,12 +3213,6 @@ TMR0                              00000FD3
 TMR0H                             00000FD4
 TMR0H0                            00000000
 TMR0H1                            00000001
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 54
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 TMR0H2                            00000002
 TMR0H3                            00000003
 TMR0H4                            00000004
@@ -3153,6 +3257,12 @@ TMR1GIP                           00000000
 TMR1H                             00000FCE
 TMR1H0                            00000000
 TMR1H1                            00000001
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 57
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 TMR1H2                            00000002
 TMR1H3                            00000003
 TMR1H4                            00000004
@@ -3162,12 +3272,6 @@ TMR1H7                            00000007
 TMR1IE                            00000000
 TMR1IF                            00000000
 TMR1IP                            00000000
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 55
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 TMR1L                             00000FCD
 TMR1L0                            00000000
 TMR1L1                            00000001
@@ -3212,6 +3316,12 @@ TMR3H0                            00000000
 TMR3H1                            00000001
 TMR3H2                            00000002
 TMR3H3                            00000003
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 58
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 TMR3H4                            00000004
 TMR3H5                            00000005
 TMR3H6                            00000006
@@ -3221,12 +3331,6 @@ TMR3IF                            00000002
 TMR3IP                            00000002
 TMR3L                             00000FC7
 TMR3L0                            00000000
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 56
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 TMR3L1                            00000001
 TMR3L2                            00000002
 TMR3L3                            00000003
@@ -3271,6 +3375,12 @@ TMR5H2                            00000002
 TMR5H3                            00000003
 TMR5H4                            00000004
 TMR5H5                            00000005
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 59
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 TMR5H6                            00000006
 TMR5H7                            00000007
 TMR5IE                            00000004
@@ -3280,12 +3390,6 @@ TMR5L                             00000FC1
 TMR5L0                            00000000
 TMR5L1                            00000001
 TMR5L2                            00000002
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 57
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 TMR5L3                            00000003
 TMR5L4                            00000004
 TMR5L5                            00000005
@@ -3330,6 +3434,12 @@ TRISC3                            00000003
 TRISC4                            00000004
 TRISC5                            00000005
 TRISC6                            00000006
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 60
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 TRISC7                            00000007
 TRMT                              00000001
 TSEL0                             00000000
@@ -3339,12 +3449,6 @@ TSEL3                             00000003
 TSEN                              00000005
 TSRNG                             00000004
 TUN0                              00000000
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 58
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 TUN1                              00000001
 TUN2                              00000002
 TUN3                              00000003
@@ -3371,9 +3475,6 @@ TXREG                             00000F9A
 TXREG1                            00000F9A
 TXSTA                             00000F9E
 TXSTA1                            00000F9E
-Test2                             000002EA
-Test3                             000002FC
-Test4                             0000030E
 TurnOffAllLEDs                    000000F2
 TurnOffLD0                        000000B6
 TurnOffLD1                        000000C2
@@ -3392,18 +3493,18 @@ VREGPM1                           00000001
 W                                 00000000
 WCOL                              00000007
 WDTCON0                           00000ED2
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 61
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 WDTCON1                           00000ED3
 WDTCS0                            00000004
 WDTCS1                            00000005
 WDTCS2                            00000006
 WDTPS0                            00000001
 WDTPS1                            00000002
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 59
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 WDTPS2                            00000003
 WDTPS3                            00000004
 WDTPS4                            00000005
@@ -3451,18 +3552,18 @@ WPUA4                             00000004
 WPUA5                             00000005
 WPUA6                             00000006
 WPUA7                             00000007
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 62
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 WPUB                              00000F18
 WPUB0                             00000000
 WPUB1                             00000001
 WPUB2                             00000002
 WPUB3                             00000003
 WPUB4                             00000004
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 60
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 WPUB5                             00000005
 WPUB6                             00000006
 WPUB7                             00000007
@@ -3510,18 +3611,18 @@ ZCDMD                             00000000
 ZCDOUT                            00000005
 ZCDPOL                            00000004
 ZCDSEN                            00000007
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 63
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 _BOREN_NOSLP_2L                   000000BF
 _BOREN_OFF_2L                     0000003F
 _BOREN_ON_2L                      0000007F
 _BOREN_SBORDIS_2L                 000000FF
 _BORV_VBOR_245_2H                 000000FE
 _BORV_VBOR_270_2H                 000000FD
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 61
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 _BORV_VBOR_285_2H                 000000FC
 _BORV_VBOR_2P45_2H                000000FF
 _CLKOUTEN_OFF_1H                  000000FF
@@ -3569,18 +3670,18 @@ _FEXTOSC_OFF_1L                   000000FC
 _FEXTOSC_RESERVED_1L              000000FB
 _FEXTOSC_XT_1L                    000000F9
 _IDLOC0                           00200000
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 64
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 _IDLOC1                           00200001
 _IDLOC10                          0020000A
 _IDLOC11                          0020000B
 _IDLOC12                          0020000C
 _IDLOC13                          0020000D
 _IDLOC14                          0020000E
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 62
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 _IDLOC15                          0020000F
 _IDLOC2                           00200002
 _IDLOC3                           00200003
@@ -3628,18 +3729,18 @@ _WDTCPS_WDTCPS_18_3L              000000F2
 _WDTCPS_WDTCPS_19_3L              000000F3
 _WDTCPS_WDTCPS_1_3L               000000E1
 _WDTCPS_WDTCPS_20_3L              000000F4
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 65
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 _WDTCPS_WDTCPS_21_3L              000000F5
 _WDTCPS_WDTCPS_22_3L              000000F6
 _WDTCPS_WDTCPS_23_3L              000000F7
 _WDTCPS_WDTCPS_24_3L              000000F8
 _WDTCPS_WDTCPS_25_3L              000000F9
 _WDTCPS_WDTCPS_26_3L              000000FA
-MPASM 5.87                          MAIN.ASM   1-13-2026  14:55:20         PAGE 63
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 _WDTCPS_WDTCPS_27_3L              000000FB
 _WDTCPS_WDTCPS_28_3L              000000FC
 _WDTCPS_WDTCPS_29_3L              000000FD
@@ -3687,8 +3788,14 @@ __18F25K40                        00000001
 lastBtnPressed                    00000000
 ledCounter                        00000001
 
+MPASM 5.87                          MAIN.ASM   1-13-2026  16:03:29         PAGE 66
+
+
+
+
+
 Errors   :     0
-Warnings :    10 reported,     0 suppressed
+Warnings :    11 reported,     0 suppressed
 Messages :     0 reported,     0 suppressed
 
 
