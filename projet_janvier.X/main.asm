@@ -25,10 +25,35 @@ CONFIG LVP = OFF
 ;*******************************************************************************
 ; VARIABLE DEFINITIONS
 ;*******************************************************************************
-  
-var	UDATA_ACS
-lastBtnPressed	    RES	    1 ; dernier bouton pressé
-ledCounter          RES     1 ; compteur de leds (0 à 4)
+
+; variables générales
+var	    UDATA_ACS
+lastBtnPressed	    RES	    1 ; indique le dernier bouton pressé
+ledvCounter         RES     1 ; compteur de leds (0 à 4) (= minutes modulo 5)
+secondsCounter      RES     1 ; compteur de secondes (0 à 60)
+minutesCounter      RES     1 ; compteur des minutes (0 à 60)
+hoursCounter        RES     1 ; compteur des heures (1 à 13)
+
+minutesIndex        RES     1 ; indice des minutes
+
+; variables temporaires
+temp		    RES     1 ; valeur temporaire pour stocker des données
+temp2		    RES     1 ; mm chose...
+tempIndex	    RES     1 ; valeur d'indice temporaire
+	    
+rgbColors   UDATA ; stocke un entier de 0 à 3 correspondant à la couleur de la LED RGB à afficher
+rgb0    RES 1
+rgb1    RES 1
+rgb2    RES 1
+rgb3    RES 1
+rgb4    RES 1
+rgb5    RES 1
+rgb6    RES 1
+rgb7    RES 1
+rgb8    RES 1
+rgb9    RES 1
+rgb10   RES 1
+rgb11   RES 1
 
 ;*******************************************************************************
 ; RESET VECTOR
@@ -203,11 +228,34 @@ START:
     ; CALL ConfigPWM
     ; CALL ConfigI2C
     
-    CLRF ledCounter ; compteur = 0 au démarrage
+    ; on clear (presque) toutes les variables
+    CLRF ledvCounter ; compteur = 0 au démarrage
+    CLRF secondsCounter
+    CLRF minutesCounter
+    CLRF hoursCounter
+    CLRF temp
+    CLRF temp2
+    CLRF tempIndex
+    CLRF minutesIndex
+    ; ... 
+    CLRF rgb0
+    CLRF rgb1
+    CLRF rgb2
+    CLRF rgb3
+    CLRF rgb4
+    CLRF rgb5
+    CLRF rgb6
+    CLRF rgb7
+    CLRF rgb8
+    CLRF rgb9
+    CLRF rgb10
+    CLRF rgb11
 
 ;*******************************************************************************
 ; BOUCLE PRINCIPALE (main loop)
 ;*******************************************************************************
+
+CALL UpdateRGBDisplay    
     
 MAIN_LOOP:
         ; CALL LEDv_blink
@@ -226,14 +274,15 @@ MAIN_LOOP:
 TEMPO_1S:
     
     MOVLW   B'10010000'		    
-    MOVWF   T0CON0, ACCESS	    ; timer1 clock Sosc
+    MOVWF   T0CON0, ACCESS	    ; timer0 clock Sosc
     
     MOVLW   B'10010000'	
     MOVWF   T0CON1, ACCESS	    ; set les valeurs du registre T0CON1
+				    ; (clock = SOSC / LFINTOSC)
     
     ; initialiser la valeur du timer à 33536
-    MOVLW   0x86
-    MOVWF   TMR0H		    ; maj TMR0H
+    MOVLW   0x86		    ; maj TMR0H
+    MOVWF   TMR0H
     MOVLW   0xE8		    ; maj TMR0L
     MOVWF   TMR0L
     
@@ -247,14 +296,14 @@ TEMPO_1S_RUN:
 TEMPO_0_5S:
     
     MOVLW   B'10010000'		    
-    MOVWF   T0CON0, ACCESS	    ; timer1 clock Sosc
+    MOVWF   T0CON0, ACCESS	    ; timer0 clock Sosc
     
     MOVLW   B'10010000'	
     MOVWF   T0CON1, ACCESS	    ; set les valeurs du registre T0CON1
     
     ; initialiser la valeur du timer à 50036
-    MOVLW   0xC3
-    MOVWF   TMR0H		    ; maj TMR0H
+    MOVLW   0xC3 		    ; maj TMR0H
+    MOVWF   TMR0H
     MOVLW   0x74		    ; maj TMR0L
     MOVWF   TMR0L
     
@@ -268,14 +317,14 @@ TEMPO_0_5S_RUN:
 TEMPO_0_2S:
     
     MOVLW   B'10010000'		    
-    MOVWF   T0CON0, ACCESS	    ; timer1 clock Sosc
+    MOVWF   T0CON0, ACCESS	    ; timer0 clock Sosc
     
     MOVLW   B'10010000'	
     MOVWF   T0CON1, ACCESS	    ; set les valeurs du registre T0CON1
     
     ; initialiser la valeur du timer à 58036
-    MOVLW   0xE2
-    MOVWF   TMR0H		    ; maj TMR0H
+    MOVLW   0xE2 		    ; maj TMR0H
+    MOVWF   TMR0H
     MOVLW   0xB4		    ; maj TMR0L
     MOVWF   TMR0L
     
@@ -286,25 +335,26 @@ TEMPO_0_2S_RUN:
     RETURN
 
 
-TEMPO_100US:
-    
-    MOVLW   B'10010000'		    
-    MOVWF   T0CON0, ACCESS	    ; timer1 clock Sosc
-    
-    MOVLW   B'10010000'	
+TEMPO_0_1S:
+
+    MOVLW   B'10010000'
+    MOVWF   T0CON0, ACCESS	    ; timer0 clock Sosc
+
+    MOVLW   B'10010000'
     MOVWF   T0CON1, ACCESS	    ; set les valeurs du registre T0CON1
-    
-    ; initialiser la valeur du timer à 65532
-    MOVLW   0xFF
-    MOVWF   TMR0H		    ; maj TMR0H
-    MOVLW   0xFC		    ; maj TMR0L
+
+    ; initialiser la valeur du timer à 61786
+    MOVLW   0xF1
+    MOVWF   TMR0H
+    MOVLW   0x5A
     MOVWF   TMR0L
-    
-TEMPO_100US_RUN:    
+
+TEMPO_0_1S_RUN:
     BTFSS   T0CON0, 5, ACCESS	    ; tester l'overflow du timer
-    GOTO    TEMPO_100US_RUN
-    BCF	    T0CON0, 7, ACCESS	    ; reset bit de démarrage
-    RETURN   
+    GOTO    TEMPO_0_1S_RUN
+
+    BCF     T0CON0, 7, ACCESS	    ; reset bit de démarrage
+    RETURN  
 
 
 TEMPO_10MS:
@@ -316,8 +366,8 @@ TEMPO_10MS:
     MOVWF   T0CON1, ACCESS	    ; set les valeurs du registre T0CON1
     
     ; initialiser la valeur du timer à 65226
-    MOVLW   0xFE
-    MOVWF   TMR0H		    ; maj TMR0H
+    MOVLW   0xFE 		    ; maj TMR0H
+    MOVWF   TMR0H
     MOVLW   0xCA		    ; maj TMR0L
     MOVWF   TMR0L
     
@@ -327,26 +377,6 @@ TEMPO_10MS_RUN:
     BCF	    T0CON0, 7, ACCESS	    ; reset bit de démarrage
     RETURN
 
-
-TEMPO_20MS:
-    
-    MOVLW   B'10010000'		    
-    MOVWF   T0CON0, ACCESS	    ; timer1 clock Sosc
-    
-    MOVLW   B'10010000'	
-    MOVWF   T0CON1, ACCESS	    ; set les valeurs du registre T0CON1
-    
-    ; initialiser la valeur du timer à 64916
-    MOVLW   0xFD
-    MOVWF   TMR0H		    ; maj TMR0H
-    MOVLW   0x94		    ; maj TMR0L
-    MOVWF   TMR0L
-    
-TEMPO_20MS_RUN:    
-    BTFSS   T0CON0, 5, ACCESS	    ; tester l'overflow du timer
-    GOTO    TEMPO_20MS_RUN
-    BCF	    T0CON0, 7, ACCESS	    ; reset bit de démarrage
-    RETURN    
 
 ;*******************************************************************************
 ; ROUTINES LEDs VERTES (RA0 à RA3)
@@ -408,7 +438,7 @@ TurnOffAllLEDs: ; éteint toutes les leds
         BCF     LATA, 3
         RETURN
 
-LEDv_blink: ; fait blinker les 4 leds vertes en série (serpent)
+LEDv_blink: ; fait blinker les 4 leds vertes en série (chenille)
         BANKSEL LATA
 
 	; ledv0
@@ -540,6 +570,12 @@ Yellow: ; ... jaune ...
     CALL ColorOn
     CALL ColorOff
     RETURN
+    
+Purple: ; ... violet ...
+    CALL ColorOff
+    CALL ColorOn
+    CALL ColorOn
+    RETURN
 
 White: ; ... blanc ...
     CALL ColorOn
@@ -605,7 +641,12 @@ AllRGBLEDsOff:
 ;*******************************************************************************       
     
 AwaitButton: ; test si un bouton est pressé
-    CALL TEMPO_0_2S
+    CALL TEMPO_0_1S
+    CALL TEMPO_10MS
+    CALL TEMPO_10MS
+    CALL TEMPO_10MS
+    CALL TEMPO_10MS
+    CALL TEMPO_10MS
     
     ButtonPress_4: ; RB4
 	BANKSEL PORTB
@@ -619,11 +660,11 @@ AwaitButton: ; test si un bouton est pressé
     ButtonPress_3: ; RB3
         BANKSEL PORTB
 	BTFSC   PORTB, 3
-	    GOTO ButtonPress_2
-	    MOVLW 0x03
-	    MOVWF lastBtnPressed
-	    ; ajouter le call à l'handle BTN3
-	    RETURN
+	GOTO ButtonPress_2
+	MOVLW 0x03
+	MOVWF lastBtnPressed
+	CALL HandleButton_3
+	RETURN
 	    
     ButtonPress_2: ; RB2
         BANKSEL PORTB
@@ -631,7 +672,7 @@ AwaitButton: ; test si un bouton est pressé
 	    GOTO ButtonPress_1
 	    MOVLW 0x02
 	    MOVWF lastBtnPressed
-	    ; ajouter le call à l'handle BTN2
+	    CALL HandleButton_2
 	    RETURN
 	    
     ButtonPress_1: ; RB1
@@ -649,134 +690,318 @@ AwaitButton: ; test si un bouton est pressé
 ; ----- HANDLE BUTTON 4 (RB4 : MINs (+)) -----
 	
 HandleButton_4:    
-    ; --- compteur == 0 ? (branch si non, continue si oui) ---
-    MOVF    ledCounter, W
-    BZ      Btn4Counter0Handle
-
-    ; --- compteur == 1 ? (branch si non, continue si oui) ---
-    MOVLW   1
-    CPFSEQ  ledCounter
-    GOTO    Btn4Test2
-    CALL    TurnOnLD0
-    CALL    TurnOnLD1
-    CALL    TurnOffLD2
-    CALL    TurnOffLD3
-    CALL    IncLEDvCounter
+    CALL    IncLEDv
     RETURN
 
-Btn4Test2:
-    ; --- test si compteur == 2 ? (branch si non, continue si oui) ---
-    MOVLW   2
-    CPFSEQ  ledCounter
-    GOTO    Btn4Test3
-    CALL    TurnOnLD0
-    CALL    TurnOnLD1
-    CALL    TurnOnLD2
-    CALL    TurnOffLD3
-    CALL    IncLEDvCounter
-    RETURN
+; ----- HANDLE BUTTON 3 (RB3 : Hs (+)) -----
+    
+HandleButton_3:
+    INCF    hoursCounter, F
 
-Btn4Test3:
-    ; --- test si compteur == 3 ? (branch si non, continue si oui) ---
-    MOVLW   3
-    CPFSEQ  ledCounter
-    GOTO    Btn4Test4
-    CALL    TurnOnAllLEDs
-    CALL    IncLEDvCounter
-    RETURN
+    MOVLW   d'12'
+    CPFSEQ  hoursCounter
+    GOTO    H3_OK
 
-Btn4Test4:
-    ; --- test si compteur < 4 ? (return si oui, branch sinon) ---
-    MOVLW   4
-    CPFSLT  ledCounter
-    GOTO    Btn4EndHandle ; sécurité
-    RETURN
+    CLRF    hoursCounter    ; 11 -> 0
 
-; handle (routine) de fin --> clear les leds vertes et la valeur de ledCounter
-Btn4EndHandle:
-    CLRF    ledCounter ; sécurité
-    CALL    TurnOffAllLEDs
+H3_OK:
+    CALL    UpdateRGBDisplay
+    RETURN
+ 
+; ----- HANDLE BUTTON 2 (RB2 : Hs (-)) -----   
+    
+HandleButton_2:
+    DECF    hoursCounter, F
+
+    MOVLW   0xFF            ; sous-dépassement ?
+    CPFSEQ  hoursCounter
+    GOTO    H2_OK
+
+    MOVLW   d'11'           ; 0 -> 11
+    MOVWF   hoursCounter
+
+H2_OK:
+    CALL    UpdateRGBDisplay
     RETURN
     
-; handle (routine) relative au test positif de ledCounter = 0 ...
-Btn4Counter0Handle:
-    CALL    TurnOnLD0
-    CALL    TurnOffLD1
-    CALL    TurnOffLD2
-    CALL    TurnOffLD3
-    CALL    IncLEDvCounter
-    RETURN
-
 ; ----- HANDLE BUTTON 1 (RB1 : MINs (-)) -----
 
 HandleButton_1:
-    ; --- compteur == 0 ? (branch si non, continue si oui) ---
-    MOVF    ledCounter, W
-    BZ      Btn1Counter0Handle
-
-    ; --- compteur == 1 ? (branch si non, continue si oui) ---
-    MOVLW   1
-    CPFSEQ  ledCounter
-    GOTO    Btn1Test2
-    CALL    TurnOffAllLEDs
-    CALL    DecLEDvCounter
-    RETURN
-
-Btn1Test2:
-    ; --- test si compteur == 2 ? (branch si non, continue si oui) ---
-    MOVLW   2
-    CPFSEQ  ledCounter
-    GOTO    Btn1Test3
-    CALL    TurnOnLD0
-    CALL    TurnOffLD1
-    CALL    TurnOffLD2
-    CALL    TurnOffLD3
-    CALL    DecLEDvCounter
-    RETURN
-
-Btn1Test3:
-    ; --- test si compteur == 3 ? (branch si non, continue si oui) ---
-    MOVLW   3
-    CPFSEQ  ledCounter
-    GOTO    Btn1Test4
-    CALL    TurnOnLD0
-    CALL    TurnOnLD1
-    CALL    TurnOffLD2
-    CALL    TurnOffLD3
-    CALL    DecLEDvCounter
-    RETURN
-
-Btn1Test4:
-    ; --- test si compteur == 4 ? (return si non, continue si oui) ---
-    MOVLW   4
-    CPFSEQ  ledCounter
-    RETURN
-    CALL    TurnOnLD0
-    CALL    TurnOnLD1
-    CALL    TurnOnLD2
-    CALL    TurnOffLD3
-    CALL    DecLEDvCounter
-    RETURN
-
-; handle (routine) relative au test positif de ledCounter = 0 ...
-Btn1Counter0Handle:
-    CALL    TurnOnAllLEDs
-    CALL    IncLEDvCounter
-    CALL    IncLEDvCounter
-    CALL    IncLEDvCounter
-    CALL    IncLEDvCounter
+    CALL    DecLEDv
     RETURN
     
 ; ----- ROUTINES GENERALES BUTTONS -----
     
-; incrémenter la valeur de la var ledCounter    
-IncLEDvCounter:
-    INCF    ledCounter, F
-    RETURN 
+;----------------------------------------
+; IncLEDv
+; +1 minute
+; met à jour :
+; - minutesCounter (0..59)
+; - hoursCounter   (1..11)
+; - ledvCounter    (minutes % 5)
+; - LEDs vertes
+; - LEDs RGB
+;----------------------------------------
 
-; décrémenter la valeur de la var ledCounter      
-DecLEDvCounter:
-    DECF    ledCounter, F
+IncLEDv:
+    INCF    minutesCounter, F
+
+    MOVLW   d'60'
+    CPFSEQ  minutesCounter
+    GOTO    IncLEDv_NoWrap
+
+    ; wrap minutes
+    CLRF    minutesCounter
+    INCF    hoursCounter, F
+
+    MOVLW   d'12'
+    CPFSEQ  hoursCounter
+    GOTO    IncLEDv_NoWrap
+
+    CLRF    hoursCounter ; 11 -> 0
+
+IncLEDv_NoWrap:
+    CALL    ComputeLedvCounter
+    CALL    UpdateGreenLEDs
+    CALL    UpdateRGBDisplay
+    RETURN
+
+;----------------------------------------
+; DecLEDv
+; -1 minute
+; met à jour :
+; - minutesCounter
+; - hoursCounter (optionnel si tu veux plus tard)
+; - ledvCounter (minutes % 5)
+; - LEDs vertes
+; - LEDs RGB
+;----------------------------------------
+
+DecLEDv:
+    DECF    minutesCounter, F
+
+    MOVLW   0xFF
+    CPFSEQ  minutesCounter
+    GOTO    DecLEDv_OK
+
+    MOVLW   d'59'
+    MOVWF   minutesCounter
+
+    DECF    hoursCounter, F
+    MOVLW   0xFF
+    CPFSEQ  hoursCounter
+    GOTO    DecLEDv_OK
+
+    MOVLW   d'11'
+    MOVWF   hoursCounter
+
+DecLEDv_OK:
+    CALL    ComputeLedvCounter
+    CALL    UpdateGreenLEDs
+    CALL    UpdateRGBDisplay
+    RETURN
+
+; ----- ROUTINE UPDATE LEDv (RB1 et 4) -----
+    
+;----------------------------------------
+; UpdateGreenLEDs
+; affiche ledvCounter (0..4) sur RA0..RA3
+;----------------------------------------
+
+UpdateGreenLEDs:
+    CALL    TurnOffAllLEDs
+
+    MOVF    ledvCounter, W
+    BZ      UGV_End ; 0 ? tout éteint
+
+    ; >= 1
+    CALL    TurnOnLD0
+    MOVLW   d'1'
+    CPFSEQ  ledvCounter
+    GOTO    UGV_Chk2
+    RETURN
+
+UGV_Chk2:
+    ; >= 2
+    CALL    TurnOnLD1
+    MOVLW   d'2'
+    CPFSEQ  ledvCounter
+    GOTO    UGV_Chk3
+    RETURN
+
+UGV_Chk3:
+    ; >= 3
+    CALL    TurnOnLD2
+    MOVLW   d'3'
+    CPFSEQ  ledvCounter
+    GOTO    UGV_Chk4
+    RETURN
+
+UGV_Chk4:
+    ; >= 4
+    CALL    TurnOnLD3
+
+UGV_End:
+    RETURN   
+    
+; ----- ROUTINES DISPLAY RGB (RB2 et 3) -----    
+
+;--------------------------------------------------
+; UpdateRGBDisplay
+; - Heures : rouge (1)
+; - Minutes : bleu (2)
+; - Heures + minutes : violet (3)
+; - Index RGB : 0..11
+;--------------------------------------------------
+
+UpdateRGBDisplay:
+    ;--------------------------------------------------
+    ; clear rgb[0..11]
+    ;--------------------------------------------------
+    LFSR    0, rgb0
+    MOVLW   d'12'
+    MOVWF   tempIndex
+
+UR_Clear:
+    CLRF    POSTINC0
+    DECF    tempIndex, F
+    BNZ     UR_Clear
+
+    ;--------------------------------------------------
+    ; HEURES --> rouge
+    ;--------------------------------------------------
+    MOVF    hoursCounter, W
+    MOVWF   tempIndex
+
+    MOVLW   d'1'            ; rouge
+    MOVWF   temp
+    CALL    LoopSetColorIndex
+
+    ;--------------------------------------------------
+    ; MINUTES --> bleu / violet
+    ;--------------------------------------------------
+    CALL    ComputeMinutesIndex
+    MOVF    minutesIndex, W
+    MOVWF   tempIndex
+
+    LFSR    0, rgb0
+    MOVF    tempIndex, W
+    ADDWF   FSR0L, F
+
+    MOVF    INDF0, W
+    BNZ     UR_Purple
+
+    MOVLW   d'2'            ; bleu
+    MOVWF   INDF0
+    GOTO    UR_Send
+
+UR_Purple:
+    MOVLW   d'3'            ; violet
+    MOVWF   INDF0
+
+UR_Send:
+    CALL    SendFullBusRGB
+    RETURN
+
+    
+LoopSetColorIndex:
+    ; écrit la couleur "temp" dans rgb[tempIndex]
+
+    LFSR    0, rgb0         ; FSR0 = &rgb0
+    MOVF    tempIndex, W    ; W = index
+    ADDWF   FSR0L, F        ; FSR0 = &rgb0 + index
+
+    MOVF    temp, W
+    MOVWF   INDF0           ; rgb[tempIndex] = temp
+
+    RETURN
+
+    
+SendColorForOneRGB:
+    MOVF    temp2, W
+    BZ      RGB_Off ; 0 -> off
+
+    MOVLW   d'1'
+    CPFSEQ  temp2
+    GOTO    TestBlue
+    CALL    Red
+    RETURN
+
+TestBlue:
+    MOVLW   d'2'
+    CPFSEQ  temp2
+    GOTO    TestPurple
+    CALL    Blue
+    RETURN
+
+TestPurple:
+    MOVLW   d'3'
+    CPFSEQ  temp2
+    GOTO    RGB_Off
+    CALL    Purple
+    RETURN
+
+RGB_Off:
+    CALL    RGBLEDOff
+    RETURN
+
+    
+SendFullBusRGB:
+    LFSR    0, rgb0         ; FSR0 -> début du tableau
+    MOVLW   d'12'
+    MOVWF   tempIndex       ; compteur de leds
+
+SendFullBusLoop:
+    MOVF    POSTINC0, W	    ; W = *FSR0 ; FSR0++
+    MOVWF   temp2
+    CALL    SendColorForOneRGB
+
+    DECF    tempIndex, F
+    BNZ     SendFullBusLoop
+    RETURN
+
+;----------------------------------------
+; calcule minutesIndex = minutesCounter / 5
+; minutesCounter : 0..59
+; minutesIndex   : 0..11
+; utilise temp
+;----------------------------------------
+
+ComputeMinutesIndex:
+    MOVF    minutesCounter, W
+    MOVWF   temp
+
+    CLRF    minutesIndex
+
+Div5_Loop:
+    MOVLW   d'5'
+    SUBWF   temp, F
+    BNC     Div5_End
+    INCF    minutesIndex, F
+    GOTO    Div5_Loop
+
+Div5_End:
+    RETURN
+
+;----------------------------------------
+; calcule ledvCounter = minutesCounter % 5
+; résultat : 0..4
+; utilise temp
+;----------------------------------------
+
+ComputeLedvCounter:
+    MOVF    minutesCounter, W
+    MOVWF   temp		; temp = minutesCounter
+
+Div5_Loop2:
+    MOVLW   d'5'
+    SUBWF   temp, F             ; temp -= 5
+    BNC     Div5_End2           ; si borrow ? temp < 0
+    GOTO    Div5_Loop2
+
+Div5_End2:
+    ADDWF   temp, W             ; W = temp + 5 (annule dernier -5)
+    MOVWF   ledvCounter         ; ledvCounter = 0..4
     RETURN
     
 END
