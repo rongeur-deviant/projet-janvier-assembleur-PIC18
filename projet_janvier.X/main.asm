@@ -30,9 +30,9 @@ CONFIG LVP = OFF
 var	    UDATA_ACS
 lastBtnPressed	    RES	    1 ; indique le dernier bouton pressé
 ledvCounter         RES     1 ; compteur de leds (0 à 4) (= minutes modulo 5)
-secondsCounter      RES     1 ; compteur de secondes (0 à 60)
+; secondsCounter      RES     1 ; compteur de secondes (0 à 60) (non utilisée)
 minutesCounter      RES     1 ; compteur des minutes (0 à 60)
-hoursCounter        RES     1 ; compteur des heures (1 à 13)
+hoursCounter        RES     1 ; compteur des heures (0 à 11)
 
 minutesIndex        RES     1 ; indice des minutes
 
@@ -41,7 +41,16 @@ temp		    RES     1 ; valeur temporaire pour stocker des données
 temp2		    RES     1 ; mm chose...
 tempIndex	    RES     1 ; valeur d'indice temporaire
 	    
-rgbColors   UDATA ; stocke un entier de 0 à 3 correspondant à la couleur de la LED RGB à afficher
+; --- variables I2C / RTC ---
+data_address   RES 1
+data_transmit  RES 1
+data_receive   RES 1
+
+; flag permettant de savoir si on modifie l'heure via les buttons ou pas
+editMode RES 1 ; 0 = normal, 1 = bouton actif	    
+	    
+; --- variables RGB ---	    
+rgbColors   UDATA_ACS ; stocke un entier de 0 à 3 correspondant à la couleur de la LED RGB à afficher
 rgb0    RES 1
 rgb1    RES 1
 rgb2    RES 1
@@ -60,7 +69,7 @@ rgb11   RES 1
 ;*******************************************************************************
 
 RES_VECT CODE 0x0000
-        GOTO    START
+    GOTO    START
 
 ;*******************************************************************************
 ; INITIALISATION DES PORTS ET MODULES
@@ -73,23 +82,23 @@ ConfigOsc:
     MOVWF   OSCCON1
 
     BANKSEL OSCFRQ
-    MOVLW   b'00001000'    ; 64 MHz
+    MOVLW   b'00001000'      ; 64 MHz
     MOVWF   OSCFRQ
     RETURN
 	
-ConfigPorts:
+ConfigLEDv:
     ; configuration port A - LEDs RA0-3
     BANKSEL ANSELA
-    CLRF    ANSELA           ; tout port A en numérique
+    CLRF    ANSELA          ; tout port A en numérique
 
     BANKSEL TRISA
-    BCF     TRISA, 0         ; RA0 sortie
-    BCF     TRISA, 1         ; RA1 sortie
-    BCF     TRISA, 2         ; RA2 sortie
-    BCF     TRISA, 3         ; RA3 sortie
+    BCF     TRISA, 0        ; RA0 sortie
+    BCF     TRISA, 1        ; RA1 sortie
+    BCF     TRISA, 2        ; RA2 sortie
+    BCF     TRISA, 3        ; RA3 sortie
 
     BANKSEL LATA
-    CLRF    LATA             ; LEDs éteintes au départ
+    CLRF    LATA	    ; LEDs éteintes au départ
     RETURN
 
 ConfigRGB:
@@ -115,68 +124,310 @@ ConfigRGB:
 ConfigButtons:
     ; RB1 (bouton minutes (-))
     BANKSEL TRISB
-    BSF TRISB, 1               ; RB1 en entrée (bouton1)
+    BSF TRISB, 1		; RB1 en entrée (bouton1)
     BANKSEL ANSELB
-    BCF ANSELB, 1              ; RB1 en numérique
+    BCF ANSELB, 1		; RB1 en numérique
     BANKSEL INLVLB
-    BSF     INLVLB, 1          ; active une entrée en TTL sur RB1 (important)
+    BSF     INLVLB, 1		; active une entrée en TTL sur RB1 (important)
     
     ; RB2 (bouton heures (-))
     BANKSEL TRISB
-    BSF TRISB, 2               ; RB2 en entrée (bouton2)
+    BSF TRISB, 2		; RB2 en entrée (bouton2)
     BANKSEL ANSELB
-    BCF ANSELB, 2              ; RB2 en numérique
+    BCF ANSELB, 2		; RB2 en numérique
     BANKSEL INLVLB
-    BSF     INLVLB, 2          ; active une entrée en TTL sur RB2 (important)
+    BSF     INLVLB, 2		; active une entrée en TTL sur RB2 (important)
     
     ; RB3 (bouton heures (+))
     BANKSEL TRISB
-    BSF TRISB, 3               ; RB3 en entrée (bouton3)
+    BSF TRISB, 3		; RB3 en entrée (bouton3)
     BANKSEL ANSELB
-    BCF ANSELB, 3              ; RB3 en numérique
+    BCF ANSELB, 3		; RB3 en numérique
     BANKSEL INLVLB
-    BSF     INLVLB, 3          ; active une entrée en TTL sur RB3 (important)
+    BSF     INLVLB, 3		; active une entrée en TTL sur RB3 (important)
     
     ; RB4 (bouton minutes (+))
     BANKSEL TRISB
-    BSF TRISB, 4               ; RB4 en entrée (bouton4)
+    BSF TRISB, 4		; RB4 en entrée (bouton4)
     BANKSEL ANSELB
-    BCF ANSELB, 4              ; RB4 en numérique
+    BCF ANSELB, 4		; RB4 en numérique
     BANKSEL INLVLB
-    BSF     INLVLB, 4          ; active une entrée en TTL sur RB4 (important)
+    BSF     INLVLB, 4		; active une entrée en TTL sur RB4 (important)
     RETURN	
 
-; ConfigPWM:
-    ; configuration du module CCP2 pour PWM
-    ; MOVLW   b'00000100'        ; CCP2 utilise Timer2
-    ; MOVWF   CCPTMRS
+;*******************************************************************************
+; INIT I2C + RTC - conforme annexe 4 (MCP7940)
+;*******************************************************************************
 
-    ; configuration PPS pour associer RC1 à CCP2
-    ; MOVLB   0x0D               ; sélection de la banque 13
-    ; MOVLW   0x0B               ; code PPS pour CCP2
-    ; MOVWF   RC1PPS, 1          ; associe CCP2 (PWM) à RC1
+InitI2C:
+    ; --- RC3 / RC4 pour I2C ---
+    BANKSEL ANSELC
+    BCF     ANSELC, 3
+    BCF     ANSELC, 4
 
-    ; configuration de la période PWM
-    ; MOVLW   0xE7               ; T2PR = 231 (~100 Hz)
-    ; MOVWF   T2PR
+    BANKSEL TRISC
+    BSF     TRISC, 3		; SCL en entrée
+    BSF     TRISC, 4		; SDA en entrée
+    
+    MOVLB   0x0E   
+    MOVLW   0x0D ; SCL
+    MOVWF   RC3PPS, 1      
+    MOVLW   0x0E ; SDA
+    MOVWF   RC4PPS, 1 
+    ; configuration du bit SMP (7) et CKE (6)
+    ; SMP = 1 (standard speed 100kHz)
+    ; CKE = 0 (I2C standard)
+    MOVLW   b'11000000'   
+    MOVWF   SSP1STAT		; le '1' indique l'utilisation de la banque
+    ; on configure le mode master I2C et on active le module
+    MOVLW   b'00101000'		; SSPEN = 1 et SSPM = 1000 (mode master)
+    MOVWF   SSP1CON1		; écriture dans le registre SSP1CON1
+    MOVLW   b'01000000' 
+    MOVWF   SSP1CON2  
+    MOVLW   b'00000000' 
+    MOVWF   SSP1CON3 
+    ; SSP1ADD : la valeur calculée pour 400kHz @ 64MHz
+    MOVLW   0x27		; 39 en décimal
+    MOVWF   SSP1ADD
+    MOVLW   b'11111110' 
+    MOVWF   SSP1MSK 
+    MOVLB   0x0E		; banque des registres I2C
+    CLRF    PIE3, 1		; désactive les interruptions I2C (on reste en polling)
+    RETURN
+    
+InitRTC:
+    ; --- secondes = 00 + ST = 1 ---
+    MOVLW   0x00
+    MOVWF   data_address
+    MOVLW   b'10000000'     ; ST = 1
+    MOVWF   data_transmit
+    CALL    send_i2c
 
-    ; configuration du rapport cyclique initial
-    ; CLRF    CYCLE              ; initialise CYCLE à 0 %
-    ; MOVLW   0x7F               ; duty cycle = 50 %
-    ; MOVWF   CCPR2H
-    ; CLRF    CCPR2L
+    ; --- minutes = 00 ---
+    MOVLW   0x01
+    MOVWF   data_address
+    CLRF    data_transmit
+    CALL    send_i2c
 
-    ; configuration de Timer2
-    ; MOVLW   b'00000001'        ; source Timer2 = Fosc/4
-    ; MOVWF   T2CLKCON
-    ; MOVLW   b'00000100'        ; active Timer2, prescaler = 1:1
-    ; MOVWF   T2CON
+    ; --- heures = 12:00 AM en mode 12h ---
+    ; bit6 = 1 (12h)
+    ; bit5 = 0 (AM)
+    ; bits4..0 = 0x12 (BCD)
+    MOVLW   0x02
+    MOVWF   data_address
+    MOVLW   b'01010010'		; 12h | AM | 12
+    MOVWF   data_transmit
+    CALL    send_i2c
+    RETURN
+    
+; ----- routines SEND et RECEIVE I2C -----
 
-    ; activation du module PWM
-    ; MOVLW   b'00111100'        ; CCP2 en mode PWM
-    ; MOVWF   CCP2CON
-    ; RETURN    
- 
+; --- SEND ---
+    
+send_i2c:
+    MOVLB   0x0E
+    BSF     SSP1CON2, 0         ; SEN = 1 (START)
+loop_send_start:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_send_start
+    BCF     PIR3, 0, 1          ; efface le flag après START
+
+    MOVLW   0xDE                ; adresse RTC + WRITE
+    MOVWF   SSP1BUF 
+loop_send_adr_dev:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_send_adr_dev
+    BCF     PIR3, 0, 1          ; efface le flag après adresse Device
+
+    MOVF    data_address, W     ; adresse du registre
+    MOVWF   SSP1BUF 
+loop_send_adr_reg:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_send_adr_reg
+    BCF     PIR3, 0, 1          ; efface le flag après adresse Registre
+
+    MOVF    data_transmit, W    ; la donnée à écrire
+    MOVWF   SSP1BUF 
+loop_send_data:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_send_data
+    BCF     PIR3, 0, 1          ; efface le flag après Donnée
+
+    BSF     SSP1CON2, 2         ; PEN = 1 (STOP)
+loop_send_stop:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_send_stop
+    BCF     PIR3, 0, 1          ; efface le flag après STOP
+    RETURN
+    
+; --- RECEIVE ---
+    
+receive_i2c:
+    MOVLB   0x0E
+    BSF     SSP1CON2, 0         ; SEN = 1 (START)
+loop_rx_start1:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_rx_start1
+    BCF     PIR3, 0, 1
+
+    MOVLW   0xDE                ; adresse RTC + WRITE (pour pointer le registre)
+    MOVWF   SSP1BUF 
+loop_rx_wait_dev1:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_rx_wait_dev1
+    BCF     PIR3, 0, 1
+
+    MOVF    data_address, W     ; quel registre veut-on lire ?
+    MOVWF   SSP1BUF 
+loop_rx_wait_reg:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_rx_wait_reg
+    BCF     PIR3, 0, 1
+
+    BSF     SSP1CON2, 1         ; RSEN = 1 (REPEATED START)
+loop_rx_restart:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_rx_restart
+    BCF     PIR3, 0, 1
+
+    MOVLW   0xDF                ; adresse RTC + READ
+    MOVWF   SSP1BUF 
+loop_rx_wait_dev2:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_rx_wait_dev2
+    BCF     PIR3, 0, 1
+
+    BSF     SSP1CON2, 3         ; RCEN = 1 (lancer la réception de l'octet)
+loop_rx_wait_data:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_rx_wait_data
+    BCF     PIR3, 0, 1
+    MOVF    SSP1BUF, W          ; lecture du buffer
+    MOVWF   data_receive
+
+    BSF     SSP1CON2, 5         ; ACKDT = 1 (on prépare un NACK)
+    BSF     SSP1CON2, 4         ; ACKEN = 1 (on envoie le NACK)
+loop_rx_wait_nack:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_rx_wait_nack
+    BCF     PIR3, 0, 1
+
+    BSF     SSP1CON2, 2         ; PEN = 1 (STOP)
+loop_rx_wait_stop:
+    BTFSS   PIR3, 0, 1 
+    GOTO    loop_rx_wait_stop
+    BCF     PIR3, 0, 1
+    RETURN
+
+; ----- autres routines I2C + RTC -----
+    
+BCD_To_Dec:
+    MOVWF   temp
+    SWAPF   temp, W
+    ANDLW   0x0F
+    MOVWF   temp2
+    MOVLW   d'10'
+    MULWF   temp2
+    MOVF    PRODL, W
+    MOVWF   temp2
+    MOVF    temp, W
+    ANDLW   0x0F
+    ADDWF   temp2, W
+    RETURN
+
+Dec_To_BCD:
+    MOVWF   temp	    ; temp = valeur décimale (0..59 ou 0..12)
+    CLRF    temp2	    ; temp2 = dizaines
+DecBCD_Loop:
+    MOVLW   d'10'
+    SUBWF   temp, F
+    BNC     DecBCD_End
+    INCF    temp2, F
+    GOTO    DecBCD_Loop
+DecBCD_End:
+    ADDWF   temp, F	    ; annule la dernière soustraction
+    SWAPF   temp2, W	    ; dizaines << 4
+    ADDWF   temp, W	    ; + unités
+    RETURN
+
+    
+ReadRTC_Time:
+    ;--------------------------------------------------
+    ; LECTURE DES MINUTES (registre 0x01)
+    ;--------------------------------------------------
+    MOVLW   0x01
+    MOVWF   data_address
+    CALL    receive_i2c
+
+    MOVF    data_receive, W
+    ANDLW   b'01111111'      ; masque bit ST
+    CALL    BCD_To_Dec       ; -> 0..59
+    MOVWF   minutesCounter
+
+
+    ;--------------------------------------------------
+    ; LECTURE DES HEURES (registre 0x02, mode 12h)
+    ;--------------------------------------------------
+    MOVLW   0x02
+    MOVWF   data_address
+    CALL    receive_i2c
+
+    MOVF    data_receive, W
+    ANDLW   b'00011111'      ; isole BCD heures (1..12)
+    CALL    BCD_To_Dec       ; -> 1..12
+    MOVWF   temp             ; temp = 1..12
+
+    ;--------------------------------------------------
+    ; Conversion RTC -> interne (0..11)
+    ; 12 -> 0
+    ; 1..11 -> 1..11
+    ;--------------------------------------------------
+    MOVLW   d'12'
+    CPFSEQ  temp
+    GOTO    RTC_H_Not12
+
+    ; --- cas 12h ---
+    CLRF    hoursCounter     ; 12 -> 0
+    RETURN
+
+RTC_H_Not12:
+    ; --- cas 1..11 ---
+    MOVF    temp, W
+    MOVWF   hoursCounter
+    RETURN
+    
+    
+WriteRTC_Minutes:
+    MOVF    minutesCounter, W
+    CALL    Dec_To_BCD
+    MOVWF   data_transmit
+    MOVLW   0x01
+    MOVWF   data_address
+    CALL    send_i2c
+    RETURN
+
+WriteRTC_Hours:
+    MOVF    hoursCounter, W	; 0..11
+    BNZ     WH_NotZero
+
+    ; 0 -> 12
+    MOVLW   d'12'
+    GOTO    WH_Convert
+
+WH_NotZero:
+    ; 1..11
+
+WH_Convert:
+    CALL    Dec_To_BCD		; -> BCD 1..12
+    ANDLW   b'00011111'		; sécurité
+    IORLW   b'01000000'		; mode 12h, AM (AM/PM ignoré)
+    MOVWF   data_transmit
+
+    MOVLW   0x02
+    MOVWF   data_address
+    CALL    send_i2c
+    RETURN
+
 ;*******************************************************************************
 ; TODO - INTERRUPT SERVICE ROUTINES (ISRs)
 ;
@@ -219,18 +470,9 @@ ConfigButtons:
 MAIN_PROG CODE
 
 START:
-    
-    ; on appelle les routines de CONFIG!
-    CALL ConfigOsc
-    CALL ConfigPorts
-    CALL ConfigRGB
-    CALL ConfigButtons
-    ; CALL ConfigPWM
-    ; CALL ConfigI2C
-    
     ; on clear (presque) toutes les variables
     CLRF ledvCounter ; compteur = 0 au démarrage
-    CLRF secondsCounter
+    ; CLRF secondsCounter (non utilisée)
     CLRF minutesCounter
     CLRF hoursCounter
     CLRF temp
@@ -250,21 +492,46 @@ START:
     CLRF rgb9
     CLRF rgb10
     CLRF rgb11
+    
+    ; on appelle les routines de CONFIG!
+    CALL ConfigOsc
+    CALL ConfigLEDv
+    CALL ConfigRGB
+    CALL ConfigButtons
+    MOVLB 0x00
+    ; on init l'I2C et la RTC (à décommenter si on veut demo le full programme)
+    CALL InitI2C
+    CALL TEMPO_0_1S
+    CALL InitRTC ; (à commenter après le premier flash
+    ; si on veut que l'heure continue de tourner)
+    
+    CALL ReadRTC_Time
 
 ;*******************************************************************************
 ; BOUCLE PRINCIPALE (main loop)
 ;*******************************************************************************
 
-CALL UpdateRGBDisplay    
+CALL AllRGBLEDsOff
+CALL UpdateRGBDisplay
     
 MAIN_LOOP:
-        ; CALL LEDv_blink
-	; CALL FirstRGBLEDWhite
-	; CALL AllRGBLEDsWhite
-	
-	CALL AwaitButton
-	
-	GOTO MAIN_LOOP ; boucle infinie
+    CALL AwaitButton
+    
+    MOVF    editMode, W
+    BZ      ReadAndDisplay
+    
+    ; si on vient d'éditer, on attend plus longtemps 
+    ; pour être sûr que la RTC a fini sa mise à jour interne
+    CALL    TEMPO_0_5S ; 0.5s
+    CLRF    editMode
+    GOTO    MAIN_LOOP
+
+ReadAndDisplay:
+    CALL    ReadRTC_Time    ; lecture normale du temps qui passe
+    CALL    ComputeLedvCounter
+    CALL    UpdateGreenLEDs
+    CALL    UpdateRGBDisplay
+    GOTO    MAIN_LOOP
 	
 ;*******************************************************************************
 ; FONCTIONS DE TEMPORISATION
@@ -471,13 +738,13 @@ LEDv_blink: ; fait blinker les 4 leds vertes en série (chenille)
 ; envoie un bit à 0 avec la bonne temporisation
 Bit0:
     BANKSEL LATC
-    BSF     LATC, 1        ; [1]
+    BSF     LATC, 1	    ; [1]
     
-    NOP                    ; [2]
-    NOP                    ; [3]
-    NOP                    ; [4]
+    NOP			    ; [2]
+    NOP			    ; [3]
+    NOP			    ; [4]
     
-    BCF     LATC, 1        ; [5] fin HAUT
+    BCF     LATC, 1	    ; [5] fin HAUT
     
     ; partie BASSE (comblage pour ~1200ns)
     NOP
@@ -641,12 +908,6 @@ AllRGBLEDsOff:
 ;*******************************************************************************       
     
 AwaitButton: ; test si un bouton est pressé
-    CALL TEMPO_0_1S
-    CALL TEMPO_10MS
-    CALL TEMPO_10MS
-    CALL TEMPO_10MS
-    CALL TEMPO_10MS
-    CALL TEMPO_10MS
     
     ButtonPress_4: ; RB4
 	BANKSEL PORTB
@@ -654,7 +915,14 @@ AwaitButton: ; test si un bouton est pressé
 	GOTO ButtonPress_3
 	MOVLW 0x04
 	MOVWF lastBtnPressed
+	
 	CALL HandleButton_4
+	CALL TEMPO_0_1S
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
 	RETURN
 	
     ButtonPress_3: ; RB3
@@ -663,71 +931,96 @@ AwaitButton: ; test si un bouton est pressé
 	GOTO ButtonPress_2
 	MOVLW 0x03
 	MOVWF lastBtnPressed
+	
 	CALL HandleButton_3
+	CALL TEMPO_0_1S
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
 	RETURN
 	    
     ButtonPress_2: ; RB2
         BANKSEL PORTB
 	BTFSC   PORTB, 2
-	    GOTO ButtonPress_1
-	    MOVLW 0x02
-	    MOVWF lastBtnPressed
-	    CALL HandleButton_2
-	    RETURN
+	GOTO ButtonPress_1
+	MOVLW 0x02
+	MOVWF lastBtnPressed
+	    
+	CALL HandleButton_2
+	CALL TEMPO_0_1S
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	RETURN
 	    
     ButtonPress_1: ; RB1
         BANKSEL PORTB
 	BTFSC   PORTB, 1
-	    GOTO ButtonPress_NO
-	    MOVLW 0x01
-	    MOVWF lastBtnPressed
-	    CALL HandleButton_1
-	    RETURN    
+	GOTO ButtonPress_NO
+	MOVLW 0x01
+	MOVWF lastBtnPressed
+	    
+	CALL HandleButton_1
+	CALL TEMPO_0_1S
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	CALL TEMPO_10MS
+	RETURN    
 	
-    ButtonPress_NO:
+    ButtonPress_NO: ; aucun bouton pressé
 	RETURN
 
 ; ----- HANDLE BUTTON 4 (RB4 : MINs (+)) -----
 	
-HandleButton_4:    
+HandleButton_4:
+    BSF     editMode, 0
     CALL    IncLEDv
+    CALL    WriteRTC_Minutes
     RETURN
 
 ; ----- HANDLE BUTTON 3 (RB3 : Hs (+)) -----
     
 HandleButton_3:
+    BSF     editMode, 0
     INCF    hoursCounter, F
-
     MOVLW   d'12'
-    CPFSEQ  hoursCounter
-    GOTO    H3_OK
-
-    CLRF    hoursCounter    ; 11 -> 0
-
-H3_OK:
+    CPFSLT  hoursCounter      ; if hoursCounter < 12 ? OK
+    CLRF    hoursCounter      ; sinon retour à 0
     CALL    UpdateRGBDisplay
+    CALL    WriteRTC_Hours
     RETURN
  
 ; ----- HANDLE BUTTON 2 (RB2 : Hs (-)) -----   
     
 HandleButton_2:
+    BSF     editMode, 0
+    MOVF    hoursCounter, W
+    BZ      H2_Wrap          ; si 0 ? wrap vers 11
+
     DECF    hoursCounter, F
+    GOTO    H2_End
 
-    MOVLW   0xFF            ; sous-dépassement ?
-    CPFSEQ  hoursCounter
-    GOTO    H2_OK
-
-    MOVLW   d'11'           ; 0 -> 11
+H2_Wrap:
+    MOVLW   d'11'
     MOVWF   hoursCounter
 
-H2_OK:
+H2_End:
     CALL    UpdateRGBDisplay
+    CALL    WriteRTC_Hours
     RETURN
     
 ; ----- HANDLE BUTTON 1 (RB1 : MINs (-)) -----
 
 HandleButton_1:
+    BSF     editMode, 0
     CALL    DecLEDv
+    CALL    WriteRTC_Minutes
     RETURN
     
 ; ----- ROUTINES GENERALES BUTTONS -----
@@ -750,16 +1043,16 @@ IncLEDv:
     CPFSEQ  minutesCounter
     GOTO    IncLEDv_NoWrap
 
-    ; wrap minutes
+    ; --- wrap minutes ---
     CLRF    minutesCounter
+
+    ; --- heure +1 ---
     INCF    hoursCounter, F
-
     MOVLW   d'12'
-    CPFSEQ  hoursCounter
-    GOTO    IncLEDv_NoWrap
-
-    CLRF    hoursCounter ; 11 -> 0
-
+    CPFSLT  hoursCounter
+    CLRF    hoursCounter
+    CALL    WriteRTC_Hours
+    
 IncLEDv_NoWrap:
     CALL    ComputeLedvCounter
     CALL    UpdateGreenLEDs
@@ -780,20 +1073,26 @@ IncLEDv_NoWrap:
 DecLEDv:
     DECF    minutesCounter, F
 
-    MOVLW   0xFF
+    MOVLW   0xFF ; test si on est passé en dessous de 0
     CPFSEQ  minutesCounter
     GOTO    DecLEDv_OK
 
+    ; --- wrap minutes (on passe de 00 à 59) ---
     MOVLW   d'59'
     MOVWF   minutesCounter
 
+    ; --- heure -1 ---
+    MOVF    hoursCounter, W
+    BZ      DecH_Wrap       ; si on était à 0, on wrap vers 11
     DECF    hoursCounter, F
-    MOVLW   0xFF
-    CPFSEQ  hoursCounter
-    GOTO    DecLEDv_OK
+    GOTO    DecH_Update
 
+DecH_Wrap:
     MOVLW   d'11'
     MOVWF   hoursCounter
+
+DecH_Update:
+    CALL    WriteRTC_Hours  ; on informe la RTC du changement d'heure!
 
 DecLEDv_OK:
     CALL    ComputeLedvCounter
@@ -856,7 +1155,7 @@ UGV_End:
 
 UpdateRGBDisplay:
     ;--------------------------------------------------
-    ; clear rgb[0..11]
+    ; 1) Clear rgb[0..11]
     ;--------------------------------------------------
     LFSR    0, rgb0
     MOVLW   d'12'
@@ -868,7 +1167,7 @@ UR_Clear:
     BNZ     UR_Clear
 
     ;--------------------------------------------------
-    ; HEURES --> rouge
+    ; 2) HEURES -> rouge
     ;--------------------------------------------------
     MOVF    hoursCounter, W
     MOVWF   tempIndex
@@ -878,31 +1177,44 @@ UR_Clear:
     CALL    LoopSetColorIndex
 
     ;--------------------------------------------------
-    ; MINUTES --> bleu / violet
+    ; 3) MINUTES -> bleu ou violet
     ;--------------------------------------------------
     CALL    ComputeMinutesIndex
+
     MOVF    minutesIndex, W
     MOVWF   tempIndex
 
+    ; comparer minutesIndex et hoursCounter
+    MOVF    minutesIndex, W
+    SUBWF   hoursCounter, W
+    BZ      Minutes_Equals_Hours
+
+    ; --- index différent : bleu ---
     LFSR    0, rgb0
     MOVF    tempIndex, W
     ADDWF   FSR0L, F
-
-    MOVF    INDF0, W
-    BNZ     UR_Purple
-
     MOVLW   d'2'            ; bleu
     MOVWF   INDF0
     GOTO    UR_Send
 
-UR_Purple:
+Minutes_Equals_Hours:
+    ; --- même index : violet ---
+    LFSR    0, rgb0
+    MOVF    tempIndex, W
+    ADDWF   FSR0L, F
     MOVLW   d'3'            ; violet
     MOVWF   INDF0
 
+
+    ;--------------------------------------------------
+    ; 4) Envoi vers les LEDs RGB
+    ;--------------------------------------------------
 UR_Send:
+    BCF     LATC, 1          ; force la ligne à 0
+    CALL    TEMPO_10MS       ; reset bus RGB
     CALL    SendFullBusRGB
     RETURN
-
+    
     
 LoopSetColorIndex:
     ; écrit la couleur "temp" dans rgb[tempIndex]
@@ -947,7 +1259,7 @@ RGB_Off:
 
     
 SendFullBusRGB:
-    LFSR    0, rgb0         ; FSR0 -> début du tableau
+    LFSR    0, rgb0	    ; FSR0 -> début du tableau
     MOVLW   d'12'
     MOVWF   tempIndex       ; compteur de leds
 
@@ -991,17 +1303,17 @@ Div5_End:
 
 ComputeLedvCounter:
     MOVF    minutesCounter, W
-    MOVWF   temp		; temp = minutesCounter
+    MOVWF   temp	    ; temp = minutesCounter
 
 Div5_Loop2:
     MOVLW   d'5'
-    SUBWF   temp, F             ; temp -= 5
-    BNC     Div5_End2           ; si borrow ? temp < 0
+    SUBWF   temp, F         ; temp -= 5
+    BNC     Div5_End2       ; si borrow ? temp < 0
     GOTO    Div5_Loop2
 
 Div5_End2:
-    ADDWF   temp, W             ; W = temp + 5 (annule dernier -5)
-    MOVWF   ledvCounter         ; ledvCounter = 0..4
+    ADDWF   temp, W         ; W = temp + 5 (annule dernier -5)
+    MOVWF   ledvCounter     ; ledvCounter = 0..4
     RETURN
     
 END
